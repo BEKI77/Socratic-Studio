@@ -1,0 +1,1178 @@
+  ADDIS ABABA SCIENCE AND TECHNOLOGY UNIVERSITY
+
+                                 College of Engineering
+
+                  Department of Electrical and computer Engineering
+
+
+                            Project proposal on
+    An SLM-based Socratic Assistant for Student
+                                Material Mastery
+
+Name​ ​       ​       ​     ​      ​     ID
+
+1.​ Anwar Abdela​     ​     ​      ​     ETS0207/14
+2.​ Aryam Ezra​       ​     ​      ​     ETS0220/14
+3.​ Bamlak Geteye​ ​        ​      ​     ETS0247/14
+4.​ Bereket Tadiwos​ ​      ​      ​     ETS0214/13
+
+
+
+Advisor: Mr. Sileshi A.
+
+
+
+
+                                                                      December 2025
+                                     DECLARATION
+We, Anwar Abdela, Aryam Ezra, Bamlak Geteye and Bereket Tadiwos, fifth year students of
+Electrical and Computer Engineering at Addis Ababa Science and Technology University
+(AASTU), hereby declare that this Final Year Project report entitled: “SLM-based Socratic
+Assistant for Student Material Mastery”, is our original work and is based on the knowledge,
+experience, and findings we have gained throughout our study period. All the contents included
+in this proposal are genuine, and any external sources used have been properly acknowledged
+and referenced in accordance with academic standards.
+
+We affirm that this report has not been submitted to any other institution for the award of any
+academic qualification. We also acknowledge the continuous support, guidance, and mentorship
+provided by our advisor throughout the development of this project.
+
+Therefore, we respectfully submit this proposal in partial fulfillment of the requirements for the
+Bachelor of Science Degree in Electrical and Computer Engineering.
+
+                                       Advisor’s Approval
+
+This certifies that the above declaration is correct and that this Final Year Project has been
+carried out under my supervision and is hereby approved for submission.
+
+Name: Mr. Sileshi A.​
+Signature: __________________________​
+Date: ______________________________
+
+                           Final Year Project Coordinator Approval
+
+This report has been reviewed and approved for submission as part of the requirements for the
+Bachelor of Science Degree.
+
+Name: _____________________________​
+Signature: __________________________​
+Date: ______________________________
+                                                         Table of Contents
+CHAPTER ONE.............................................................................................................................1
+INTRODUCTION........................................................................................................................... 1
+   1.1 Background of the Study................................................................................................................... 2
+      1.2 Problem Statement............................................................................................................... 4
+      1.3 Objective.............................................................................................................................. 5
+          1.3.1 General Objective....................................................................................................... 5
+          1.3.2 Specific Objectives..................................................................................................... 5
+   1.4 Significance of the Study...................................................................................................................5
+        1.4.1 Bridging the Theoretical-Practical Dichotomy........................................................................ 5
+        1.4.2 Advancing AI-Enhanced Knowledge Management.................................................................5
+        1.4.3 Mitigating Generative Inaccuracies......................................................................................... 6
+        1.4.4 Promoting Deep Learning through Dialogic Scaffolding........................................................ 6
+   1.5 Scope................................................................................................................................................. 6
+        1.5.1 Functional Scope......................................................................................................................6
+        1.5.2 Data Scope............................................................................................................................... 7
+        1.5.3 Methodological Scope..............................................................................................................7
+   1.6 Limitations.........................................................................................................................................8
+        1.6.1 Dependence on Data Quality................................................................................................... 8
+        1.6.2 Privacy and Security Risks...................................................................................................... 8
+   1.7 Project flowchart................................................................................................................ 8
+CHAPTER TWO............................................................................................................................ 9
+LITERATURE REVIEW................................................................................................................. 9
+   2.1 Knowledge Management Systems in Education............................................................................... 9
+   2.2 The Learning Crisis in STEM Education........................................................................................ 10
+   2.3. Personalized Learning and Adaptive Systems................................................................................11
+   2.4 Retrieval-Augmented.......................................................................................................................12
+   2.5 The Socratic Method and AI-Powered Tutoring............................................................................. 13
+   2.6 Vector Databases and Semantic Search Technology....................................................................... 15
+   2.7 Multi-Document Integration and Context Synthesis....................................................................... 16
+   2.8 Evaluation Metrics for Educational AI Systems............................................................................. 17
+   2.9 Ethical Considerations and Limitations...........................................................................................18
+   2.10 Related Works, Gap Analysis and Project Contribution............................................................... 19
+CHAPTER THREE...................................................................................................................... 20
+DESIGN METHODOLOGY......................................................................................................... 20
+      3.1 Phase I: Requirement Analysis and Specification............................................................. 20
+      3.2 Phase II: Data Pipeline Engineering.................................................................................. 21
+      3.3 Phase III: Parallel Development Streams.......................................................................... 22
+      3.4 Phase IV: System Integration and Optimization................................................................ 25
+     3.5 Phase V: Testing, Validation, and Evaluation.................................................................... 25
+CHAPTER FOUR........................................................................................................................ 28
+WORK PLAN AND TIMELINE.................................................................................................... 28
+CHAPTER FIVE........................................................................................................................................29
+EXPECTED RESULTS...............................................................................................................29
+           5.1 Technical Performance..............................................................................................................29
+           5.2 Educational Impact................................................................................................................... 29
+           5.3 Functional Deliverable.............................................................................................................. 29
+CHAPTER SIX............................................................................................................................ 30
+CONCLUSION...........................................................................................................................................30
+REFERENCES.............................................................................................................................31
+                                LIST OF FIGURES
+
+●​ Figure 1: Flowchart of the proposed system
+
+●​ Figure 2: System Architecture and Components Block Diagram of the Proposed System
+
+●​ Figure 3: RAG Flow Chart of the Proposed System
+
+●​ Figure 4: Overall Workflow of the Proposed System
+
+●​ Figure 5: Project timeline
+                               LIST OF ABBREVIATIONS
+
+AI - Artificial Intelligence
+API - A formal Application Programming Interface
+BAAI - Beijing Academy of Artificial Intelligence
+BERT - Bidirectional Encoder Representations from Transformers
+BM25 - Best Matching 25
+CILP - Constructivist Inquiry-Based Learning Prompting
+CPU - Central Processing Unit
+CVs - Curricula Vitae
+DB - Database
+FAISS - Facebook AI Similarity Search
+FERPA - Family Educational Rights and Privacy Act
+GDPR - General Data Protection Regulation
+GGUF - GPT-Generated Unified Format
+HTTP - Hypertext Transfer Protocol
+ICCCA - International Conference on Computing, Communication and Automation
+ITS - Intelligent Tutoring Systems
+JSON - JavaScript Object Notation
+KLI - Knowledge-Learning-Instruction
+KM - Knowledge Management
+LaTeX - Lamport TeX
+LLMs - Large Language Models
+MRR - Mean Reciprocal Rank
+MTEB - Massive Text Embedding Benchmark
+NLP - Natural Language Processing
+OCR - Optical Character Recognition
+PDF - Portable Document Format
+PoC - Proof of Concept
+RAG - Retrieval-Augmented Generation
+SLM - Small Language Model
+STEM - Science, Technology, Engineering, and Mathematics
+UI - User Interface
+UX - User Experience
+                                    CHAPTER ONE
+
+                                   INTRODUCTION
+
+The integration of abstract theoretical knowledge with practical applications continues to present
+significant challenges in STEM education, particularly in physics and mathematics. Research
+work demonstrates that students frequently struggle to connect mathematical formalism with
+physical intuition, resulting in limited problem-solving transferability and conceptual
+understanding [1]. The usual traditional educational approaches and existing digital learning
+platforms fail to provide adequate personalized scaffolding, offering standardized content that
+cannot adapt to individual learning trajectories or domain-specific contexts.
+
+This project aims to bridge these limitations through an SLM-based Socratic Assistant
+implementing Retrieval-Augmented Generation (RAG) architecture, building upon recent
+advancements in educational AI systems [2]. The system constructs a dynamic knowledge base
+from individual students' academic materials including lecture notes, textbooks, and
+problem-solving histories, enabling context-aware tutoring that emulates the adaptive support
+mechanisms of human experts [3]. By embedding established pedagogical frameworks that
+prioritize conceptual understanding and real-world applications, the assistant delivers
+personalized guidance across fundamental undergraduate topics, transforming passive content
+consumption into an active learning partnership that cultivates both technical proficiency and
+practical intuition.
+
+
+
+
+                                                                                                1
+1.1 Background of the Study
+
+Here are the key technical concepts involved in the project, explained to create the contextual
+background necessary to understand the project.
+
+Static vs. Dynamic Knowledge Repositories
+Static repositories are centralized storages for archival and retrieval purposes. They require users
+to know exactly what they are searching for, lack contextual understanding of queries, cannot
+adapt to individual learning needs, and provide no guidance on how to apply retrieved
+information. Dynamic KM systems address these shortcomings through intelligent query
+interpretation, personalized content recommendation, adaptive learning pathways, and
+integration of multiple knowledge sources.
+
+AI-Enhanced Knowledge Management Architecture
+Modern AI-powered KM systems incorporate several key components: semantic understanding
+engines that interpret user intent, knowledge graphs that map relationships between concepts,
+recommendation algorithms that suggest relevant materials, and feedback loops that
+continuously improve system performance based on user interactions.
+
+These KM systems can also be implemented for educational purposes as well. The usual method
+of education has a slow pace of development and is characterized with deprived smart KM
+system. Studies show AI based KM implementation in the higher education sector has a
+promising result.
+
+Adaptive Learning Technologies
+Current adaptive learning systems employ various approaches: rule-based systems that follow
+predetermined branching logic, Bayesian knowledge tracing that models student understanding
+probabilistically, item response theory that adjusts difficulty based on performance, and deep
+learning models that identify patterns in student behavior. Each approach has strengths and
+limitations in terms of accuracy, interpretability, and computational requirements.
+
+
+
+
+                                                                                                  2
+RAG Architecture Fundamentals
+Retrieval-Augmented Generation represents a hybrid approach combining information retrieval
+with text generation. Unlike pure language models that rely solely on parameters learned during
+training, RAG systems retrieve relevant information from external knowledge bases before
+generating responses. This architecture consists of a retriever component that finds relevant
+documents, an encoder that processes retrieved information, and a generator that produces
+coherent responses grounded in retrieved content. Recent systematic surveys summarize RAG’s
+technical components, deployment patterns, and practical deployment challenges, reinforcing
+RAG as the recommended architecture for knowledge-intensive tutoring systems. A
+comprehensive review of RAG explains core pipeline stages—chunking, dense embedding,
+(re)ranking, and generator fusion strategies (early/late/weighted)—and formalizes RAG as
+marginalizing generator outputs across retrieved documents, which explains how grounding
+reduces hallucinations and allows knowledge updates without retraining [6].
+
+Vector Database Technologies
+Vector databases provide efficient storage and retrieval of embeddings. Technologies like FAISS,
+Pinecone, Weaviate, and Milvus offer different trade-offs between speed, accuracy, and
+scalability. Key features include approximate nearest neighbor search for fast retrieval, filtering
+capabilities to constrain searches, and hybrid search combining semantic and keyword
+approaches.
+
+
+
+
+                                                                                                 3
+1.2 Problem Statement
+
+Have you ever finished a course and realized you didn’t truly understand the main ideas? Have
+you ever looked back and asked yourself: Did I actually learn anything? Why am I learning this?
+Where is this knowledge useful, and why should I study something I won’t use in my day-to-day
+life?
+
+Many students face these questions because there is a significant gap between theoretical
+knowledge, real understanding, and the ability to apply that knowledge in real-world situations.
+
+Research demonstrates a documented gap between academic learning and practical application.
+Globally, surveys reveal that more than 60% of employers believe graduates lack real-world
+experience, and 51% believe graduates do not have the right skill sets required for jobs.
+Moreover, 85% of graduates feel their degrees didn’t prepare them for workplace demands, and
+just 24% say they have all the skills they need for their current role [10].
+
+In Ethiopia, studies report that 80% of students reported that their academic programs lacked
+sufficient practical experience such as internships, projects, or fieldwork. 75% of employers
+expressed concern that graduates lacked the practical problem-solving skills necessary for
+effective performance in the workplace, and 68% of students felt they were not adequately
+prepared to face professional challenges upon graduation — contributing to ongoing dependence
+on foreign experts for technical roles that local graduates should be filling [11].
+
+Our SLM-based Assistant is designed to bridge this gap. It serves as a specialized tool trained on
+STEM-related subjects that can accurately analyze the information students provide, identify
+misunderstandings, and guide them toward clear comprehension and practical application of key
+concepts.
+
+By leveraging a RAG-based model, the assistant minimizes hallucinations and ensures reliable,
+context-aware feedback. Ultimately, our goal is to help students move from confusion to
+clarity—enabling them to understand concepts deeply, apply them effectively in real-world
+scenarios, and build meaningful experience and skills they can confidently showcase on their
+CVs.
+
+
+                                                                                                   4
+1.3 Objective
+
+1.3.1 General Objective
+
+To design and develop an SLM-based Socratic Assistant to manage personal knowledge that
+bridge theoretical knowledge to the practical world
+
+1.3.2 Specific Objectives
+
+   ●​ To investigate and identify the core problem of the traditional knowledge management
+       and educational system
+   ●​ To design an AI integrated solution targeting the identified problems
+   ●​ To develop an initial proof of concept for the solution
+   ●​ To deploy a fully functional system at a prototype level
+   ●​ To perform various tests on the proposed system
+
+
+1.4 Significance of the Study
+
+This project holds significant value for the academic community and the field of educational
+technology by directly addressing the conceptual application deficit in STEM education.
+
+1.4.1 Bridging the Theoretical-Practical Dichotomy
+
+Current educational research indicates that a majority of students struggle to connect
+mathematical formulas and equations with physical intuition, often failing to apply learned
+formulas to novel contexts shortly after instruction [1]. This study aims to resolve this by
+creating a tool that transforms passive content consumption into an active learning partnership,
+facilitating the transition from rote memorization to deep conceptual transfer.
+
+1.4.2 Advancing AI-Enhanced Knowledge Management
+
+While organizations have traditionally relied on static archival repositories for documentation,
+the integration of AI into these systems is necessary to meet modern standards of efficiency and
+context-awareness [4]. This project demonstrates a practical application of dynamic Knowledge
+
+
+                                                                                              5
+Management (KM) in education, moving away from passive storage toward systems that can
+interpret user intent and synthesize information from personal notes.
+
+1.4.3 Mitigating Generative Inaccuracies
+
+Standard generative models often suffer from "hallucinations" or lack of grounding, which is
+critical in engineering fields where precision is paramount. By utilizing Retrieval-Augmented
+Generation (RAG), this project implements a solution that significantly outperforms
+language-only models in knowledge-intensive tasks, ensuring that responses are grounded in
+factual, retrieved data [2].
+
+1.4.4 Promoting Deep Learning through Dialogic Scaffolding
+
+The study integrates established pedagogical frameworks into AI interaction. By scaffolding the
+system to use inquiry-based learning rather than direct answering, the project leverages
+constructive cognitive effort to foster critical thinking. Research suggests that this type of guided
+interaction with AI yields significantly better learning outcomes and conceptual understanding
+than unguided usage [7].
+
+1.5 Scope
+
+The scope defines the technical boundaries, data sources, and functional capabilities of the
+Personal Knowledge SLM-based Assistant based on the design methodology.
+
+1.5.1 Functional Scope
+
+The system is designed as a web-based application employing a Retrieval-Augmented
+Generation (RAG) architecture. Its core functions are limited to:
+
+    ●​ Ingestion: Converting multi-format files (PDF, LaTeX, Text) into vector embeddings.
+    ●​ Retrieval: Using semantic search (Cosine Similarity) to locate relevant information
+        chunks within the database.
+    ●​ Generation: Producing context-aware responses using a Small Language Model (SLM)
+        configured to follow Socratic tutoring principles.
+
+
+
+                                                                                                   6
+1.5.2 Data Scope
+
+To ensure the system functions as a reliable academic tutor, the knowledge base is strictly limited
+to a "Closed-Domain" environment. The data ingestion pipeline is designed to process the
+following specific academic formats:
+
+   ●​ Primary Unstructured Data: Digital lecture slides (PDF) and reference textbooks
+       officially utilized by the AASTU Department of Electrical and Computer Engineering.
+   ●​ Structured STEM Data: LaTeX (.tex) source files. These are prioritized because they
+       preserve the semantic structure of complex mathematical equations and symbols better
+       than standard optical character recognition (OCR).
+   ●​ Semi-Structured Data: Historic problem sets, solution keys, and laboratory manuals.
+
+Justification for Data Selection
+
+The restriction of the Retrieval-Augmented Generation (RAG) system to these verified local files
+serves two critical engineering objectives:
+
+   ●​ Curriculum Alignment: The system’s responses are forced to align with the specific
+       methodologies, notations, and definitions taught within the university curriculum,
+       avoiding generic or conflicting information often found in open-domain Large Language
+       Models.
+   ●​ Hallucination Mitigation: By grounding the generation process exclusively in verified
+       textbooks, the probability of the model fabricating information is significantly
+       minimized.
+
+1.5.3 Methodological Scope
+
+The development follows a Modular Systems Architecture with two parallel streams: the AI
+Backend (RAG logic, Vector DB) and the Full-Stack Application (UI/UX), as outlined in the
+project's design methodology. Validation is scoped to technical performance (latency, retrieval
+accuracy) and qualitative student feedback.
+
+
+
+
+                                                                                                 7
+1.6 Limitations
+
+While the proposed solution addresses key gaps in educational technology, it is subject to
+specific limitations inherent to the current state of AI and the chosen architecture.
+
+1.6.1 Dependence on Data Quality
+
+The system’s output quality is strictly bound by the input data. If a student uploads poorly
+structured notes or incorrect material, the RAG system may retrieve and synthesize inaccurate
+information. This challenge regarding data quality and availability is a known hurdle in
+implementing AI in knowledge management systems [5].
+
+1.6.2 Privacy and Security Risks
+
+Since the system indexes personal student documents, which may contain sensitive data, privacy
+remains a significant concern. While the project aims for local or secure processing, the
+deployment of RAG systems on user-owned data requires robust privacy controls and consent
+workflows that are complex to fully implement in a prototype phase [6].
+
+
+1.7 Project flowchart
+
+
+
+
+                            Figure 1: Flowchart of the proposed system
+
+                                                                                            8
+                                    CHAPTER TWO
+
+                             LITERATURE REVIEW
+
+2.1 Knowledge Management Systems in Education
+
+Companies rely on documentation to expand and utilize their knowledge base. They can achieve
+this in two methods, either with static repositories or dynamic Knowledge Management (KM)
+systems. To meet today’s standard, the second option is most preferred. There are simple
+dynamic KMs that have been around for a while but empowering them with AI boosts the
+efficiency. This is a suitable implementation of AI in knowledge management [4].
+
+Evolution of Knowledge Management Systems
+
+The trajectory of KM systems has progressed through three distinct generations. First-generation
+systems (1990s-2000s) focused on document management and basic search functionality,
+essentially serving as digital filing cabinets. Second-generation systems (2000s-2010s)
+introduced taxonomies, metadata tagging, and collaborative features, enabling better
+organization and knowledge sharing. Third-generation systems (2010s-present) leverage artificial
+intelligence, machine learning, and natural language processing to provide intelligent,
+context-aware knowledge delivery.
+
+Challenges of implementing AI in existing system
+The implementation of AI in the knowledge management system face many challenges. One of
+the main challenges in implementing AI into such knowledge management systems is the
+question of privacy. The data used to train these models may involve personal and organizational
+data. There is also the concern of biasing in the training process. If the training is biased, it
+compromises the integrity and reliability of the implemented model to do its task.
+
+As a new system, integration of AI into an organizational system must align with the
+organizational value and principles. Defying these values results in resistance to embrace the
+technological significance of the new system. Historically, new technologies of their era also
+
+
+                                                                                               9
+have technological challenges regarding the available resources, security, robustness and
+complexity.
+
+All these concerns regarding AI implementation into an existing system can be classified into
+three major groups. Technological challenges: includes factors like data quality and availability,
+scalability, transparency, reliability and robustness, security and privacy, and algorithm
+complexity, organizational challenges: involves factors like resistance to change, lack of
+expertise, interdepartmental collaboration, and budget constraints and ethical challenges:
+encompassing the factors bias, accountability, privacy, transparency, and lack of job security [5].
+
+
+2.2 The Learning Crisis in STEM Education
+
+Quantifying the Problem
+The integration of abstract theoretical knowledge with practical applications continues to present
+significant challenges in STEM education, particularly in physics and mathematics. Current
+research demonstrates that students frequently struggle to connect mathematical formalism with
+physical intuition, resulting in limited problem-solving transferability and conceptual
+understanding.
+
+Wieman's comprehensive study revealed alarming statistics: only 30% of students retain core
+concepts one semester after instruction, 65% of students cannot apply learned formulas to novel
+problems, 45% report feeling "lost" during lectures despite attending regularly, and 70% rely on
+memorization rather than understanding. These findings suggest fundamental flaws in the usual
+educational approaches.
+
+Cognitive Load Theory and STEM Learning
+Cognitive load theory provides insight into why students struggle with complex STEM topics.
+Working memory has limited capacity, and when instructional materials impose excessive
+cognitive load, learning suffers. STEM subjects often present high intrinsic complexity (inherent
+difficulty of the material), extraneous load (poor instructional design), and insufficient germane
+load (cognitive resources devoted to schema construction and automation).
+
+
+
+                                                                                                 10
+The Transfer Problem
+One of the most significant challenges in STEM education is the transfer of learning—the ability
+to apply knowledge learned in one context to new situations. Research indicates that students
+often develop "brittle knowledge" that works only for problems identical to those practiced. They
+struggle to recognize when a concept applies to a novel scenario, cannot adapt solution strategies
+to new problem types, and fail to connect related concepts across different courses.
+
+Misconceptions and Conceptual Change
+Students enter STEM courses with pre-existing mental models, often based on everyday
+experience, that conflict with scientific understanding. These misconceptions are remarkably
+resistant to change. Traditional instruction that simply presents correct information rarely
+succeeds in overcoming deeply held incorrect beliefs. Effective learning requires explicitly
+confronting misconceptions, providing cognitive conflict that challenges existing beliefs, and
+offering alternative frameworks that better explain observations.
+
+
+2.3. Personalized Learning and Adaptive Systems
+
+The usual educational approaches and existing digital learning platforms fail to provide adequate
+personalized scaffolding, offering standardized content that cannot adapt to individual learning
+trajectories or domain-specific contexts.
+
+The Case for Personalization
+Educational research consistently demonstrates that personalized instruction significantly
+outperforms one-size-fits-all approaches. Students learn at different rates, require different
+amounts of practice, benefit from different explanation styles, and have varying levels of prior
+knowledge. Personalized learning systems can adjust content difficulty dynamically, provide
+additional examples when needed, skip material already mastered, and adapt explanation style to
+student preferences.
+
+
+
+
+                                                                                               11
+Intelligent Tutoring Systems (ITS)
+Intelligent Tutoring Systems represent a mature approach to personalized education. Successful
+ITS implementations share common features: detailed student models tracking knowledge and
+skills, expert models encoding domain knowledge, pedagogical models determining instructional
+strategies, and user interfaces facilitating natural interaction. Studies show well-designed ITS can
+approach the effectiveness of human one-on-one tutoring.
+
+The review also shows that targeted (guided) use of generative AI yields better learning
+outcomes than unguided frequent usage, indicating that personalization must be coupled with
+scaffolding on how to interact with the system. This suggests the personal assistant should
+include onboarding / prompt templates and scaffolded workflows (e.g., “explain concept”,
+“Socratic hint”, “worked numerical example”) rather than leave all prompting to novice users
+[7].
+
+Limitations of Current Platforms
+Despite advances, most educational technology platforms exhibit significant shortcomings. They
+offer limited content coverage restricted to specific topics, lack integration with students'
+personal materials, provide superficial feedback without deep explanation, cannot handle
+open-ended questions effectively, and fail to develop metacognitive skills and learning strategies.
+
+
+2.4 Retrieval-Augmented
+
+Generation: A Paradigm Shift
+This project addresses these limitations through a SLM-based Socratic Assistant implementing
+Retrieval-Augmented Generation (RAG) architecture, building upon recent advancements in
+educational AI systems.
+
+Advantages Over Pure Language Models
+RAG systems address critical limitations of standard language models. They reduce
+hallucinations by grounding responses in factual sources, enable easy knowledge updates without
+retraining, provide transparency through source attribution, and scale to large knowledge bases
+
+
+                                                                                                 12
+efficiently. For educational applications, these advantages are particularly valuable as accuracy
+and verifiability are paramount.
+
+RAG in Knowledge-Intensive Tasks
+Lewis et al. demonstrated RAG's superiority in knowledge-intensive NLP tasks, showing
+improvements of 10-20% over comparable language-only models on question answering
+benchmarks. The system performs particularly well on tasks requiring factual accuracy,
+integration of multiple information sources, and handling of rare or specialized knowledge.
+
+Educational RAG Implementations
+Applying RAG to education requires specific adaptations. Educational RAG systems must
+handle multi-modal content (text, equations, diagrams), maintain pedagogical appropriateness in
+responses, balance accuracy with appropriate difficulty level, and support progressive disclosure
+of information. Recent implementations have shown promising results in mathematics tutoring,
+science education, and programming instruction.
+
+Technical Challenges in Educational RAG
+Several technical challenges arise when implementing RAG for education: chunking strategies
+must preserve conceptual coherence, retrieval must consider pedagogical relevance not just
+semantic similarity, generation must follow Socratic principles rather than direct answer
+provision, and the system must handle mathematical notation and equations effectively.
+
+
+2.5 The Socratic Method and AI-Powered Tutoring
+
+The system constructs a dynamic knowledge base from individual students' academic materials
+including lecture notes, textbooks, and problem-solving histories, enabling context-aware
+tutoring that emulates the adaptive support mechanisms of human experts.
+
+Historical Foundation of Socratic Teaching
+The Socratic method, developed by the ancient Greek philosopher Socrates, emphasizes learning
+through questioning rather than direct instruction. This approach guides students to discover
+knowledge independently, develops critical thinking skills, exposes gaps in understanding, and
+
+                                                                                              13
+promotes deeper, more durable learning. Modern educational psychology has validated the
+effectiveness of this approach, particularly for developing higher-order thinking skills.
+
+Cognitive Science Foundations
+The Knowledge-Learning-Instruction (KLI) framework proposed by Koedinger et al. provides
+theoretical grounding for effective tutoring. This framework distinguishes between different
+types of knowledge: declarative knowledge (facts and concepts), procedural knowledge (how to
+perform tasks), and conditional knowledge (when to apply procedures). Effective instruction
+must address all three types and facilitate their integration.
+
+Desirable Difficulties and Productive Struggle
+Contemporary learning science emphasizes that some difficulty during learning is beneficial.
+"Desirable   difficulties"   that require    effortful   retrieval, generation of answers, and
+connection-making lead to stronger learning than passive review. Socratic tutoring naturally
+incorporates these principles by requiring students to actively construct understanding rather than
+passively receive information.
+
+Implementation in AI Systems
+Implementing Socratic tutoring in AI systems requires sophisticated prompt engineering and
+dialogue management. The system must ask appropriate questions that guide without revealing
+answers, recognize when students are genuinely stuck versus productively struggling, provide
+hints at appropriate levels of specificity, and adjust questioning strategy based on student
+responses. Multi-turn dialogue capabilities and context maintenance are essential.
+
+Prompt Engineering for Socratic Dialogue
+Effective Socratic AI tutors employ multi-layered prompts that establish the tutoring role and
+pedagogical approach, incorporate retrieved context from student materials, structure the
+dialogue to guide discovery, and include safeguards against providing direct answers. Prompt
+design must balance guidance with autonomy, ensuring students remain engaged without
+becoming frustrated.
+
+
+
+                                                                                                14
+A controlled classroom study validates a constructivist prompt-engineering approach called the
+Constructivist Inquiry-Based Learning Prompting (CILP) framework, where students were
+trained to craft, refine, and critique prompts when using ChatGPT as a supplemental tutor. The
+intervention (n=120, quasi-experimental) demonstrated statistically significant gains in
+conceptual understanding and reductions in qualitative misconceptions (e.g., entropy, internal
+energy) when ChatGPT was used in a guided, inquiry-based manner — though
+quantitative/numerical problem-solving gains were limited. This supports embedding explicit
+prompt-crafting and metacognitive reflection into AI tutoring workflows [7].
+
+
+2.6 Vector Databases and Semantic Search Technology
+
+The usual information retrieval based on keyword matching suffers from vocabulary mismatch
+problems. Students may phrase questions differently than how information appears in source
+materials, synonyms and related terms are not recognized, and conceptual relationships between
+topics are ignored. Semantic search addresses these limitations by representing text based on
+meaning rather than exact words.
+
+Vector Embeddings and Semantic Space
+Modern semantic search relies on vector embeddings—dense numerical representations of text in
+high-dimensional space. These embeddings are learned by neural networks trained on large text
+corpora, capturing semantic relationships such that similar concepts have similar vector
+representations. In this semantic space, mathematical operations correspond to meaningful
+relationships: similar vectors represent similar concepts, vector arithmetic can capture analogies
+(e.g., "king" - "man" + "woman" ≈ "queen"), and distance metrics quantify semantic similarity.
+
+Embedding Models for Educational Content
+Choosing appropriate embedding models is crucial for educational applications. General-purpose
+models like Sentence-BERT provide strong baseline performance, domain-specific models
+fine-tuned on scientific text better capture technical terminology, and multi-modal models can
+handle equations and diagrams alongside text. Recent research explores embedding models
+specifically optimized for educational content, incorporating pedagogical relationships between
+concepts. The review highlights practical chunking strategies specific to educational content
+                                                                                                 15
+(semantic chunking that respects topic boundaries, controlled overlap to retain continuity, and
+metadata enrichment) and recommends hybrid retrieval (dense + BM25) plus re-ranking for
+increased precision in high-stakes domains. These findings directly inform index construction for
+student-uploaded materials. [6]
+
+Chunking Strategies for Educational Content
+Effective RAG systems require careful text chunking—dividing documents into segments for
+embedding and retrieval. Educational content presents unique challenges: preserving complete
+explanations and derivations, maintaining context for mathematical expressions, balancing
+granularity (small chunks for precision vs. large chunks for context), and handling hierarchical
+structure (sections, subsections, examples).
+
+Research suggests optimal strategies include semantic chunking that respects topic boundaries,
+overlapping chunks (10-15%) to prevent context loss, metadata enrichment with section titles
+and topics, and adaptive chunk sizing based on content density.
+
+
+2.7 Multi-Document Integration and Context Synthesis
+
+The Challenge of Fragmented Knowledge
+Students' learning materials are inherently fragmented across multiple sources: lecture notes
+from different sessions, textbook chapters, supplementary readings, problem sets, and personal
+notes. Traditional search returns individual fragments without synthesizing information across
+sources. Effective learning requires integrating these fragments into coherent understanding.
+
+Cross-Document Reasoning
+Advanced RAG systems must perform cross-document reasoning: identifying complementary
+information across sources, resolving contradictions or different perspectives, synthesizing
+comprehensive answers from multiple fragments, and tracking provenance to attribute
+information to sources. This capability is particularly valuable for complex topics covered
+differently in various materials.
+
+
+
+
+                                                                                                16
+Context Window Management
+Language models have limited context windows—the amount of text they can process
+simultaneously. When retrieved content exceeds this limit, sophisticated strategies are needed:
+ranking retrieved chunks by relevance, compressing or summarizing less critical information,
+iterative refinement where initial responses are enhanced with additional context, and
+hierarchical processing that first identifies relevant documents then focuses on specific sections.
+
+
+2.8 Evaluation Metrics for Educational AI Systems
+
+Technical Performance Metrics
+Evaluating RAG systems requires multiple technical metrics. Retrieval accuracy measures
+whether the system finds relevant information: precision (proportion of retrieved chunks that are
+relevant), recall (proportion of relevant chunks that are retrieved), and Mean Reciprocal Rank
+(MRR) assessing ranking quality. Generation quality evaluates the produced responses: factual
+accuracy against source materials, coherence and fluency of explanations, and faithfulness to
+retrieved content without hallucination.
+
+Pedagogical Effectiveness Metrics
+Beyond technical performance, educational systems must be evaluated on learning outcomes:
+conceptual understanding measured through pre- / post-testing, transfer ability to solve novel
+problems, retention over time, and metacognitive development including learning strategies and
+self-assessment accuracy.
+
+The RAG survey further synthesizes recommended evaluation axes—retrieval metrics
+(precision/recall/MRR),     generation     faithfulness   (fact-check    /   hallucination    rates),
+latency/compute efficiency, and task-specific pedagogical outcomes — recommending mixed
+technical + pedagogical evaluation for educational RAG systems. These metrics should be used
+to evaluate both your retriever (how often it finds the right passage) and generator (how
+accurately it explains or scaffolds learning) [6].
+
+
+
+
+                                                                                                  17
+User Experience Metrics
+Student satisfaction and engagement are critical for adoption: perceived usefulness and ease of
+use, time spent with the system, types of questions asked, and qualitative feedback on
+explanation quality.
+
+
+2.9 Ethical Considerations and Limitations
+
+Academic Integrity Concerns
+AI tutoring systems must carefully balance support with academic integrity. Systems should
+guide learning without completing assignments, encourage understanding over answer-seeking,
+and include safeguards against misuse. Transparent communication about appropriate use cases
+is essential.
+
+Bias and Fairness
+AI systems can perpetuate biases present in training data or source materials. Educational AI
+must be evaluated for equitable performance across different student populations, representation
+of diverse perspectives, and accessibility for students with disabilities.
+
+Privacy and Data Security
+Student data is highly sensitive. Systems must implement robust security measures, obtain
+informed consent, provide transparency about data usage, and comply with regulations like
+FERPA and GDPR. The review explicitly flags privacy and security as open challenges for RAG
+when indexing user-owned or proprietary data, and points to emerging directions
+(privacy-preserving RAG, federated vector DBs, access control layers) that must be considered
+when building systems that index student notes. For a personal assistant that indexes student
+documents, implementing privacy controls, consent workflows, and possible on-device or
+federated indexing will be necessary to mitigate risk [6].
+
+Limitations of AI Tutoring
+AI systems cannot fully replace human instructors. They lack true understanding and may miss
+subtle student difficulties, cannot provide emotional support and motivation, and may struggle
+
+                                                                                             18
+with highly creative or open-ended problems. AI tutoring is best viewed as a complement to, not
+replacement for, human instruction.
+
+
+2.10 Related Works, Gap Analysis and Project Contribution
+
+Current Landscape Limitations
+Despite significant advances in educational technology and AI, substantial gaps remain in
+available solutions. Existing systems typically focus on single domains with preloaded content,
+lack integration with students' personal materials, provide limited personalization based on
+individual learning trajectories, offer superficial feedback without deep Socratic guidance, and
+fail to synthesize information across multiple sources.
+
+While CILP and other generative-AI tutoring interventions demonstrate clear benefits for
+conceptual understanding, they also expose key limitations: generative models without retrieval
+grounding can struggle with numerical accuracy and with citing sources. This underscores our
+choice to use a RAG-based assistant that fuses the dialogic strengths of LLMs (Socratic
+questioning, conceptual scaffolding) with retrieval grounding (student materials, worked
+examples and authoritative sources) to reduce hallucinations and improve numeric/derivation
+accuracy [7].
+
+This Project's Unique Contribution
+This Personal SLM-based Socratic Assistant addresses these gaps through several innovations:
+personal knowledge base construction from student-uploaded materials, RAG architecture
+ensuring factual accuracy grounded in student's own content, Socratic tutoring approach
+promoting deep understanding, multi-document synthesis for comprehensive answers, and
+context-aware responses considering student's learning history.
+
+The system represents a significant advance toward truly personalized, adaptive STEM education
+that bridges the gap between theoretical knowledge and practical application, transforming
+passive content consumption into active learning partnerships.
+
+
+
+
+                                                                                             19
+                                  CHAPTER THREE
+
+                           DESIGN METHODOLOGY
+
+To address the complexity of integrating artificial intelligence with a functional user application,
+this project adopts a Modular Systems Architecture supported by a Parallel Development
+Strategy.
+
+This methodology structure divides the overall system into well-defined, independent modules
+that can be developed, tested, and improved separately before being integrated into a single
+complete system. The whole process combines multiple components of technologies to work
+together, serving for singular purpose. These components need a thorough development process.
+The modularization technique allows individual development without compromising each other.
+This smooths out the entirety of the project flow. It also enables iterative feedback loops of
+development, while minimizing overall project delays.
+Here follows the system development structure divided into phases.
+
+
+3.1 Phase I: Requirement Analysis and Specification
+
+The first phase defines the exact objectives, limitations and expected performance of the system.
+The focus is on translating the project idea into clear technical specifications. Following the
+standards of Software requirement and specification, here are the functional and non-functional
+requirements.
+
+Functional Requirements
+The system must be able to:
+   ●​ Accept multi-format learning materials such as PDF files, LaTeX documents, and plain
+       text.
+   ●​ Reformat the input data or materials to a machine understandable data
+   ●​ Perform semantic search, meaning that the system understands the meaning of a question
+       rather than just matching keywords.
+   ●​ Utilize the existing knowledge base to retrieve relevant information
+
+
+                                                                                                 20
+   ●​ Generate context-aware, explanatory responses using a Socratic tutoring approach
+       (guiding the learner through reasoning instead of only giving final answers).
+   ●​ Allow the user to interact through a web-based chat interface.
+
+Non-Functional Requirements
+   ●​ Low latency: The system should return results with minimal delay to support natural
+       interaction.
+   ●​ Scalability: The design should support the addition of new documents without reducing
+       performance.
+   ●​ Security and privacy: User-uploaded documents and queries must be protected from
+       unauthorized access.
+   ●​ Usability: The system should be simple enough for students with basic computer
+       knowledge to use easily.
+In addition to the specifications, to promote the parallel development structure, early API
+definition is implemented in this phase as well. Detail explanation of the API definition is
+provided below.
+
+API Contract Definition
+A formal Application Programming Interface (API) contract is defined at this stage. This API
+specifies how the Frontend (user interface) and Backend (AI + database) will communicate,
+including:
+   ●​ Request formats (JSON)
+   ●​ Response formats
+   ●​ Required variables and data types
+
+
+3.2 Phase II: Data Pipeline Engineering
+
+This phase focuses on transforming raw, unstructured educational material into a structured and
+searchable knowledge base. It forms the foundation of the Retrieval-Augmented Generation
+(RAG) system.
+
+
+
+
+                                                                                               21
+Data Ingestion and Preprocessing
+   ●​ Documents such as lecture notes, textbooks, and research materials are loaded into the
+       system.
+   ●​ Special characters, incorrect encodings, and irrelevant symbols are removed.
+   ●​ Mathematical equations and formulas are preserved for engineering accuracy.
+   ●​ Text is normalized into a consistent, readable format.
+
+Semantic Chunking
+The cleaned text is divided into smaller, meaningful sections called chunks.
+   ●​ Each chunk represents a complete idea or concept.
+   ●​ Overlapping regions (approx. 10%) are used to prevent loss of context between chunks.
+   ●​ The chunk size is optimized to balance detail and processing efficiency.
+
+Vectorization and Indexing
+Each text chunk is converted into a vector embedding using a pre-trained embedding model.
+These vectors represent the semantic meaning of the text in numerical form.
+   ●​ The vectors are stored in a Vector Database.
+   ●​ The database is optimized for Cosine Similarity Search, allowing the system to quickly
+       retrieve the most related pieces of information when a query is made.
+This transforms static documents into a searchable semantic knowledge base.
+
+
+3.3 Phase III: Parallel Development Streams
+
+This phase is executed in two parallel streams to increase efficiency and allow simultaneous
+progress. Both streams operate independently using the predefined API contract.
+
+Stream A: AI Backend & RAG Engine Development
+This stream builds the core intelligence of the system.
+RAG Logic Implementation
+
+   ●​ The user’s question is converted into a query vector.
+   ●​ The Vector Database is searched for the top k most relevant text chunks.
+
+                                                                                               22
+   ●​ These chunks are passed as context to the Small Language Model (SLM).
+
+
+Model Selection and Computational Optimization
+After a comparative analysis of available Small Language Models (SLMs), this project selects
+Microsoft’s Phi-3.5 Mini.
+
+Unlike general-purpose models trained on internet scrapings, the Phi series is trained specifically
+on "textbook-quality" synthetic data. This training methodology results in superior performance
+on reasoning capabilities and STEM-related logic tasks, making it uniquely improved for an
+educational tutoring assistant.
+
+The model supports a 128k token context window, allowing the system to ingest and analyze
+entire chapters or lengthy lecture notes in a single inference pass, ensuring comprehensive
+answer synthesis.
+
+To balance performance with resource efficiency, the model will be deployed using 4-bit
+Quantization (GGUF format). This optimization allows for edge deployment, enabling the
+system to perform low-latency inference on standard computing hardware without reliance on
+external cloud computing resources or extensive training periods.
+
+For the semantic retrieval component, the system utilizes the bge-small-en-v1.5 model. This
+model was selected for its high placement on the MTEB (Massive Text Embedding Benchmark),
+offering a high-fidelity vector representation of technical engineering terminology while
+maintaining a compact computational footprint.
+
+
+
+Prompt Engineering
+Special multi-layered prompts are designed to:
+   ●​ Force the AI to act as an engineering tutor
+   ●​ Follow the Socratic method
+   ●​ Explain reasoning and practical applications
+   ●​ Avoid unsupported or imaginary information
+Backend Server Construction
+   ●​ A Backend Server is built to:
+                                                                                                23
+            ○​ Manage user sessions
+            ○​ Receive requests from the frontend
+            ○​ Send queries to the Vector DB and SLM
+            ○​ Return final responses to the user
+Unit Testing
+Individual components such as:
+    ●​ Data retrieval
+    ●​ Similarity matching
+    ●​ Prompt generation
+are tested independently to ensure correctness.
+
+Stream B: Full-Stack Application Development
+This stream builds the visual and interactive part of the project.
+UI/UX Design
+A clean and simple layout is designed with two main sections:
+
+
+    1.​ Document Dashboard
+            ○​ Upload study materials
+            ○​ View and manage stored files
+    2.​ Chat Interface
+            ○​ Ask questions
+            ○​ View AI responses
+            ○​ Support code and equations
+Frontend Development
+    ●​ Includes structured formatting for mathematical outputs
+UX Validation
+Initial testing is done to ensure:
+    ●​ Navigation is clear
+    ●​ Buttons and interactions are user-friendly
+    ●​ Information is displayed logically
+
+
+
+                                                                     24
+3.4 Phase IV: System Integration and Optimization
+This phase merges the two parallel development streams into one functional system. We use the
+API points we create at the early stage of the project to integrate the modularized partitions of
+the system.
+
+API Connection and Testing
+   ●​ The frontend is connected to the backend using the predefined API.
+   ●​ Full data flow is tested from:
+              ○​ User input → AI processing → Displayed response
+
+Performance Optimization
+   ●​ Latency (response time) is analyzed and reduced where possible.
+   ●​ Unnecessary data processing is removed to improve speed.
+   ●​ Memory usage and CPU efficiency are monitored and optimized.
+This phase ensures the system behaves as a single coherent unit.
+
+
+3.5 Phase V: Testing, Validation, and Evaluation
+
+This final phase evaluates the system using both technical and educational metrics.
+
+Technical Validation
+The developers of the system use technical measurements to evaluate the system’s final output.
+
+The following key metrics are measured:
+   ●​ Retrieval Accuracy – How often the correct information is found
+   ●​ Hit Rate – Whether a relevant document appears in the top results
+   ●​ MRR (Mean Reciprocal Rank) – Ranking quality of retrieved results
+   ●​ Fidelity Score – Percentage of answers that directly match the source documents
+
+
+
+
+                                                                                              25
+Pedagogical (Educational) Validation
+   ●​ Final validation is performed by the end users. The system is tested by undergraduate
+       engineering students. Since the target users are the students, the final validation point is
+       their feedback.
+   ●​ Feedback is collected on:
+           ○​ Clarity of explanation
+           ○​ Ability to connect theory to real-world applications
+           ○​ Overall usefulness in learning complex topics
+This ensures the system is not only technically correct, but also educationally effective.
+
+
+
+
+    Figure 2: System Architecture and Components Block Diagram of the Proposed System
+
+
+
+
+                                                                                                  26
+Figure 3: RAG Flow Chart of the Proposed System
+
+
+
+
+Figure 4: Overall Workflow of the Proposed System
+
+
+                                                    27
+    CHAPTER FOUR
+
+WORK PLAN AND TIMELINE
+
+
+
+
+     Figure 5: Project timeline
+
+                                  28
+                                    CHAPTER FIVE
+
+                                EXPECTED RESULTS
+
+By the end, this project aims to achieve the following outcomes:
+
+5.1 Technical Performance
+
+The system is expected to demonstrate superior performance in knowledge-intensive tasks
+compared to standard language models by reducing fabrication rates. By retrieving relevant
+document segments before generating answers, the fidelity of the responses to the source
+material is expected to increase [2].
+
+The search mechanism is expected to successfully overcome semantic discontinuity. Through the
+use of vector embeddings, the system should correctly identify relevant sections in textbooks or
+notes even when the student's query uses synonyms or different phrasing than the source text.
+
+5.2 Educational Impact
+
+Students using the system are expected to show improvements in conceptual understanding. By
+enforcing a guided inquiry mode where the AI asks follow-up questions rather than providing
+immediate answers, the system aims to replicate the learning gains associated with human
+one-on-one tutoring [3].
+
+The project expects to validate that targeted, prompt-engineered AI interaction leads to a
+reduction in common misconceptions in STEM topics, as opposed to the unguided use of
+generative AI [7].
+
+5.3 Functional Deliverable
+
+The final result will be a working Proof of Concept (PoC) capable of ingesting PDF/LaTeX
+documents, indexing them into a Vector Database, and allowing a user to interact with this
+personal knowledge base via a chat interface with low latency and high semantic relevance.
+
+
+
+
+                                                                                                29
+                                      CHAPTER SIX
+
+                                      CONCLUSION
+
+This project was initiated to address the persistent disconnect between abstract theoretical
+knowledge and practical application in STEM education. Research highlights that traditional
+educational approaches often fail to facilitate the transfer of learning, leaving students relying on
+rote memorization rather than deep conceptual understanding [1]. The developed Personal
+Knowledge SLM-based Assistant serves as a strategic intervention to bridge this gap, offering a
+specialized tool that transforms passive content consumption into an active, inquiry-based
+learning partnership.
+
+To achieve this, the system leverages a Retrieval-Augmented Generation (RAG) architecture,
+moving beyond the limitations of standard generative models. By grounding AI responses in a
+dynamic knowledge base constructed from the student’s own academic materials, the system
+mitigates the risks of unverified outputs and semantic hallucination commonly associated with
+Large Language Models [2]. This ensures that the assistance provided is, not only technically
+accurate but, also contextually aligned with the specific curriculum and lecture notes the student
+is currently studying.
+
+Beyond technical accuracy, the project integrates established pedagogical frameworks to foster
+cognitive development. By implementing an inquiry-based tutoring model, the assistant is
+designed to guide users through reasoning processes rather than providing immediate solutions.
+This method aligns with cognitive science principles, promoting constructive cognitive effort and
+helping students identify and correct misconceptions through dialogic scaffolding [7]. This
+approach addresses the limitations of generic educational platforms that often lack the
+personalization required to support individual learning trajectories.
+
+Ultimately, this project represents a significant shift from static archival repositories to dynamic,
+AI-enhanced Knowledge Management systems [4]. By successfully combining semantic search
+technology with educational theory, the proposed solution offers a viable pathway toward truly
+personalized education. It demonstrates that AI can serve as a capability amplifier for students,
+
+
+                                                                                                  30
+transforming the solitary act of studying into an interactive, context-aware partnership that
+effectively prepares them for the complexities of real-world engineering challenges.
+
+
+                                    REFERENCES
+[1] C. E. Wieman, "Large-scale comparison of science teaching methods sends clear message,"
+    Proc. Nat. Acad. Sci., vol. 111, no. 23, pp. 8319-8320, Jun. 2014.
+
+[2] P. Lewis et al., "Retrieval-augmented generation for knowledge-intensive NLP tasks," Adv.
+    Neural Inf. Process. Syst., vol. 33, pp. 9459-9474, Dec. 2020.
+
+[3] K. R. Koedinger, A. T. Corbett, and C. Perfetti, "The Knowledge-Learning-Instruction
+
+[4] “Bilal louafi 2 Djamel Nessah 3 Ridha Mahalaine AI Based Knowledge Management
+    Systems: A Review of AI Techniques, Applications and Challenges.”
+
+[5] M. Rezaei, “Artificial intelligence in knowledge management: Identifying and addressing the
+    key implementation challenges,” Technol Forecast Soc Change, vol. 217, Aug. 2025, doi:
+    10.1016/j.techfore.2025.124183.
+
+[6] O. Oche, A. Ntonga, and M. Ibrahim, “A Systematic Review of Key Retrieval-Augmented
+    Generation (RAG) Systems: Progress, Gaps, and Future Directions,” arXiv preprint, 2025.
+
+[7] M. El Fathi, S. Benamar, and R. Alami, “Integrating generative AI into STEM education:
+    enhancing conceptual understanding, addressing misconceptions, and assessing student
+    acceptance,” Disciplinary & Interdisciplinary Sci. Educ. Research, 2025.
+
+[8] framework: Bridging the science-practice chasm to enhance robust student learning," Cogn.
+    Sci., vol. 36, no. 5, pp. 757-798, Aug. 2012.
+
+[9] D. Galgotia and N. Lakshmi, “Implementation of Knowledge Management with Artificial
+    Intelligence in Higher Education,” in 2021 IEEE 6th International Conference on
+    Computing, Communication and Automation, ICCCA 2021, Institute of Electrical and
+    Electronics Engineers Inc., 2021, pp. 832–836. doi: 10.1109/ICCCA52192.2021.9666300.
+
+
+
+
+                                                                                            31
+[10] New Survey Highlights Skills Gap in Recent College Graduates, Hult International Business
+    School, 2024. [Online]. Available: https://www.hult.edu/blog/wi_skills_survey/ (Accessed:
+    Dec. 2025)
+
+[11] Disconnection between Academia and the Labor Market, BIRCU Journal, 2025. [Online].
+    Available:        https://www.bircu-journal.com/index.php/birci/article/download/8026/pdf
+    (Accessed: Dec. 2025)
+
+
+
+
+                                                                                           32
+
