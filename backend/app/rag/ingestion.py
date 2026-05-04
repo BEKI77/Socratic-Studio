@@ -26,14 +26,28 @@ vector_store = PGVector(
 
 # 3. Process and Ingest
 async def ingest_uploaded_file(file: UploadFile):
-    
     temp_path = f"temp_{file.filename}"
-    with open(temp_path, "wb") as buffer:
-        buffer.write(await file.read())
-    
-    docs = load_document(temp_path)
-    chunks = text_splitter.split_documents(docs)
-    
-    add_documents_to_db(chunks)
-    
-    os.remove(temp_path)
+    try:
+        # Write file to disk
+        with open(temp_path, "wb") as buffer:
+            buffer.write(await file.read())
+        
+        # Load and Split
+        docs = load_document(temp_path)
+        chunks = text_splitter.split_documents(docs)
+        
+        # Add to DB
+        add_documents_to_db(chunks)
+        
+        # RETURN a dictionary so the API can show success
+        return {
+            "status": "success",
+            "filename": file.filename,
+            "chunks_ingested": len(chunks)
+        }
+
+    finally:
+        # Using 'finally' ensures the temp file is deleted 
+        # even if the code above crashes.
+        if os.path.exists(temp_path):
+            os.remove(temp_path)

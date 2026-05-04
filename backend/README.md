@@ -28,4 +28,24 @@ backend/
 └── requirements.txt        # Project dependencies
 ```
 
-## How to run on local machine
+## How to run on local machine after cloning
+
+1. If you want to create a separate environment for this project run the following in the project's backend root directory.
+
+    ```cmd
+    python -m venv venv
+    ```
+
+2. Run the following command in your terminal under the directory you cloned the code.
+
+    ```cmd
+    docker-compose up -d
+    ```
+
+3. Run the following command
+
+    ```cmd
+    fastapi dev
+    ```
+
+### Note: For the docker-compose command to work, first you need to open you docker app

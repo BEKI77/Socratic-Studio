@@ -1,10 +1,14 @@
 import os
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql+psycopg://user:pass@localhost:5432/db")
+    DATABASE_URL: str
+    hf_token: str
+    model_api_url: str
     
-    class Config:
-        env_file = ".env"
+    model_config = SettingsConfigDict(
+        env_file=".env", 
+        extra="ignore"
+    )
 
 settings = Settings()

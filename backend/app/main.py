@@ -1,24 +1,12 @@
 from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.routes import chats
+from app.api.routes import chats, documents
 from .store import add_document, list_documents, search_documents
 from .text_utils import build_socratic_response
 from app.db.session import engine
 from sqlalchemy import text
 from contextlib import asynccontextmanager
-
-
-app = FastAPI(title="Socratic RAG Tutor API", version="0.1.0")
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-app.include_router(chats.router, prefix="/api/v1", tags=["Chat"])
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -39,5 +27,18 @@ async def lifespan(app: FastAPI):
     engine.dispose()
     print("Database connection closed.")
 
-# Initialize the app with the lifespan
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(title="Socratic RAG Tutor API", version="0.1.0", lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(chats.router, prefix="/api/v1", tags=["Chat"])
+app.include_router(documents.router, prefix="/api/v1", tags=["Documents"])
+
+@app.get("/")
+def root():
+    return {"message": "Server is running! Go to /docs for Swagger."}
