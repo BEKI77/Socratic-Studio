@@ -21,7 +21,7 @@ async def generate_socratic_response(question: str, context_chunks: list):
             response = await client.post(
                 settings.model_api_url, 
                 json={
-                    "model": "socratic-tutor",
+                    "model": "socratic-phi",
                     "prompt": prompt,
                     "stream": False,
                     "options": {
@@ -29,13 +29,17 @@ async def generate_socratic_response(question: str, context_chunks: list):
                         "num_predict": 256   # Limits response length to keep it concise
                     }
                 },
-                timeout=30.0 
+                timeout=100.0 
             )
             
             response.raise_for_status()
             return response.json().get("response")
             
-        except httpx.HTTPStatusError as e:
-            return f"Error from model server: {e.response.status_code}"
-        except Exception:
-            return "I'm having trouble connecting to my brain. Please try again."
+        except httpx.TimeoutException:
+            return "The model took too long to respond. Check if your computer is lagging."
+        except httpx.ConnectError:
+            return "Could not reach Ollama. Is it running on the correct port?"
+        except Exception as e:
+            # This will print the REAL error in your terminal/command prompt
+            print(f"CRITICAL ERROR: {type(e).__name__}: {e}")
+            return f"Technical Error: {type(e).__name__}"

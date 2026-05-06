@@ -3,14 +3,15 @@ from langchain_core.documents import Document
 from langchain_postgres import PGVector
 from langchain_huggingface import HuggingFaceEmbeddings
 import os
+from app.core.config import settings
 
 # 1. Initialize the embedding model
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
 # 2. Configure the connection
-CONNECTION_STRING = os.getenv("DATABASE_URL")
+CONNECTION_STRING = settings.DATABASE_URL
 
-# print(f"DEBUG: Connection string is: {CONNECTION_STRING}")
+print(f"DEBUG: Connection string is: {CONNECTION_STRING}")
 
 COLLECTION_NAME = "socratic_tutor_collection"
 
@@ -19,6 +20,8 @@ vector_store = PGVector(
     embeddings=embeddings,
     connection=str(CONNECTION_STRING),
     collection_name=COLLECTION_NAME,
+    create_extension=False, 
+    use_jsonb=True
 )
 
 def add_documents_to_db(chunks: List[Document]):

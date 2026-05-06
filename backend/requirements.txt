@@ -3,6 +3,8 @@ fastapi-cli==0.0.7
 uvicorn[standard]==0.30.6
 python-multipart==0.0.9
 pypdf==4.2.0
+psycopg2
+# psycopg[binary]
 
 langchain
 langchain-community

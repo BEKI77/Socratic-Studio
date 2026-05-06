@@ -5,6 +5,7 @@ from langchain_postgres import PGVector
 from app.rag.document_loader import load_document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from app.rag.vector_store import add_documents_to_db
+from app.core.config import settings
 
 text_splitter = RecursiveCharacterTextSplitter(
     chunk_size=1000,    # Target ~1000 tokens
@@ -15,7 +16,7 @@ text_splitter = RecursiveCharacterTextSplitter(
 embeddings_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
 # 2. Configure PGVector Store
-CONNECTION_STRING = os.getenv("DATABASE_URL") # e.g., postgresql+psycopg://user:pass@host:port/dbname
+CONNECTION_STRING = settings.DATABASE_URL # e.g., postgresql+psycopg://user:pass@host:port/dbname
 COLLECTION_NAME = "socratic_tutor_collection"
 
 vector_store = PGVector(

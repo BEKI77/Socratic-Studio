@@ -2,8 +2,6 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes import chats, documents
-from .store import add_document, list_documents, search_documents
-from .text_utils import build_socratic_response
 from app.db.session import engine
 from sqlalchemy import text
 from contextlib import asynccontextmanager
