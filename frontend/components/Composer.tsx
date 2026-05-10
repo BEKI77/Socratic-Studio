@@ -79,24 +79,23 @@ const Composer = forwardRef<ComposerRef, ComposerProps>(function Composer({ onSe
   const hasContent = value.trim().length > 0
 
   return (
-    <div className="border-t border-zinc-200/60 px-4 py-4 sm:px-6 dark:border-zinc-800">
+    <div className="relative px-4 pb-8 pt-4 sm:px-6 lg:px-10">
       <div
         className={cls(
-          "mx-auto flex flex-col rounded-3xl border bg-white/90 shadow-sm backdrop-blur dark:bg-zinc-950/90 transition-all duration-200",
-          "max-w-3xl border-zinc-200/80 dark:border-zinc-800",
+          "mx-auto flex flex-col rounded-[28px] border transition-all duration-300 glass shadow-2xl",
+          "max-w-3xl border-border/40 hover:border-primary/30 group focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary/50",
         )}
       >
-        {/* Textarea area - grows upward */}
-        <div className="flex-1 px-4 pt-4 pb-2">
+        <div className="flex-1 px-5 pt-5 pb-3">
           <textarea
             ref={inputRef}
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            placeholder="Ask a concept question or request a hint..."
+            placeholder="Ask a question or share your thoughts..."
             rows={1}
             className={cls(
-              "w-full resize-none bg-transparent text-sm outline-none placeholder:text-zinc-400 transition-all duration-200",
-              "min-h-[24px] text-left leading-6",
+              "w-full resize-none bg-transparent text-[16px] outline-none placeholder:text-muted-foreground/50 transition-all duration-200",
+              "min-h-[28px] text-left leading-relaxed font-medium",
             )}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
@@ -107,32 +106,33 @@ const Composer = forwardRef<ComposerRef, ComposerProps>(function Composer({ onSe
           />
         </div>
 
-        {/* Bottom toolbar: + on left, mic/send on right */}
-        <div className="flex items-center justify-between px-3 pb-3">
-          <ComposerActionsPopover>
+        <div className="flex items-center justify-between px-4 pb-4">
+          <div className="flex items-center gap-1">
+            <ComposerActionsPopover>
+              <button
+                className="inline-flex h-10 w-10 items-center justify-center rounded-2xl text-muted-foreground hover:bg-accent/50 hover:text-foreground transition-all duration-200"
+                title="Tools"
+              >
+                <Plus className="h-5 w-5" />
+              </button>
+            </ComposerActionsPopover>
             <button
-              className="inline-flex shrink-0 items-center justify-center rounded-full p-2 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-300 transition-colors"
-              title="Add attachment"
-            >
-              <Plus className="h-5 w-5" />
-            </button>
-          </ComposerActionsPopover>
-
-          <div className="flex items-center gap-1 shrink-0">
-            <button
-              className="inline-flex items-center justify-center rounded-full p-2 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300 transition-colors"
-              title="Voice input"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-2xl text-muted-foreground hover:bg-accent/50 hover:text-foreground transition-all duration-200"
+              title="Voice"
             >
               <Mic className="h-5 w-5" />
             </button>
+          </div>
+
+          <div className="flex items-center gap-2">
             <button
               onClick={handleSend}
               disabled={sending || busy || !hasContent}
               className={cls(
-                "inline-flex shrink-0 items-center justify-center rounded-full p-2.5 transition-colors",
+                "inline-flex h-11 w-11 items-center justify-center rounded-2xl transition-all duration-300",
                 hasContent
-                  ? "bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
-                  : "bg-zinc-200 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600 cursor-not-allowed",
+                  ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:scale-105 active:scale-95"
+                  : "bg-muted text-muted-foreground/50 cursor-not-allowed opacity-50",
               )}
             >
               {sending || busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
@@ -141,8 +141,8 @@ const Composer = forwardRef<ComposerRef, ComposerProps>(function Composer({ onSe
         </div>
       </div>
 
-      <div className="mx-auto mt-4 max-w-3xl px-2 text-center text-[11px] text-zinc-400 dark:text-zinc-500">
-        Socratic responses are hints, not final answers.
+      <div className="mx-auto mt-4 max-w-3xl px-2 text-center text-[12px] font-medium text-muted-foreground/60">
+        Socratic Studio is here to guide you through hints and reflective questions.
       </div>
     </div>
   )

@@ -87,6 +87,7 @@ export interface SidebarProps {
   uploadStatus?: string
   isUploading?: boolean
   onUpload?: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onDocumentClick?: (documentName: string) => void
 }
 
 export interface ConversationRowProps {

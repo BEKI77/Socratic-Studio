@@ -70,9 +70,17 @@ export default function TemplateRow({ template, onUseTemplate, onEditTemplate, o
   return (
     <div className="group">
       <div className="flex items-center justify-between rounded-lg px-2 py-2 text-sm hover:bg-accent dark:hover:bg-accent">
-        <button
+        <div
+          role="button"
+          tabIndex={0}
           onClick={handleUse}
-          className="flex items-center gap-2 flex-1 text-left min-w-0"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault()
+              handleUse()
+            }
+          }}
+          className="flex items-center gap-2 flex-1 text-left min-w-0 cursor-pointer outline-none focus-visible:ring-1 focus-visible:ring-primary/50 rounded"
           title={`Use template: ${template.snippet}`}
         >
           <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
@@ -80,7 +88,7 @@ export default function TemplateRow({ template, onUseTemplate, onEditTemplate, o
             <div className="truncate font-medium">{template.name}</div>
             <div className="truncate text-xs text-muted-foreground dark:text-muted-foreground">{template.snippet}</div>
           </div>
-        </button>
+        </div>
 
         <div className="flex items-center gap-1">
           <span className="hidden group-hover:inline text-xs text-muted-foreground dark:text-muted-foreground px-1">Use</span>

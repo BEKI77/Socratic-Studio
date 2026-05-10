@@ -114,21 +114,25 @@ const ChatPane = forwardRef<ChatPaneRef, ChatPaneProps>(function ChatPane(
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col">
-      <div className="flex-1 space-y-6 overflow-y-auto px-4 py-6 sm:px-6 lg:px-10">
+    <div className="flex h-full min-h-0 flex-1 flex-col bg-transparent">
+      <div className="flex-1 space-y-8 overflow-y-auto px-4 py-8 sm:px-6 lg:px-10 scroll-smooth">
         <div className="mx-auto w-full max-w-3xl">
-          <div className="mb-2 font-serif text-3xl tracking-tight sm:text-4xl md:text-5xl">
-            <span className="block leading-[1.08]">{conversation.title}</span>
+          <div className="mb-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <h1 className="font-serif text-4xl tracking-tight sm:text-5xl md:text-6xl text-gradient">
+              {conversation.title}
+            </h1>
           </div>
-          <div className="mb-4 text-sm text-zinc-500 dark:text-zinc-400">
+          <div className="mb-6 flex items-center gap-3 text-sm text-muted-foreground">
+            <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
             Updated {timeAgo(conversation.updatedAt)} · {count} messages
           </div>
 
-          <div className="mb-6 flex flex-wrap gap-2 border-b border-zinc-200 pb-5 dark:border-zinc-800">
-            {tags.map((t) => (
+          <div className="mb-10 flex flex-wrap gap-2">
+            {tags.map((t, i) => (
               <span
                 key={t}
-                className="inline-flex items-center rounded-full border border-zinc-200 bg-white/70 px-3 py-1 text-xs text-zinc-700 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/70 dark:text-zinc-200"
+                style={{ animationDelay: `${i * 100}ms` }}
+                className="inline-flex items-center rounded-xl border border-border/50 bg-background/50 px-4 py-1.5 text-xs font-medium text-foreground/80 backdrop-blur-sm shadow-sm transition-all hover:bg-accent/50 hover:scale-105 animate-in fade-in slide-in-from-left-4"
               >
                 {t}
               </span>
@@ -137,10 +141,19 @@ const ChatPane = forwardRef<ChatPaneRef, ChatPaneProps>(function ChatPane(
         </div>
 
         {messages.length === 0 ? (
-          <div className="mx-auto w-full max-w-3xl rounded-2xl border border-dashed border-zinc-300 bg-white/70 p-6 text-sm text-zinc-500 shadow-sm dark:border-zinc-700 dark:bg-zinc-950/60 dark:text-zinc-400">
-            No messages yet. Upload notes or ask a question to begin.
+          <div className="mx-auto w-full max-w-3xl animate-in fade-in zoom-in duration-500">
+            <div className="rounded-[32px] border border-dashed border-border/50 bg-background/30 p-12 text-center backdrop-blur-sm">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <Square className="h-8 w-8 rotate-45" />
+              </div>
+              <h3 className="mb-2 text-xl font-semibold">Start your session</h3>
+              <p className="text-sm text-muted-foreground max-w-xs mx-auto">
+                Upload your lecture notes or ask a specific question to begin your Socratic learning journey.
+              </p>
+            </div>
           </div>
         ) : (
+
           <div className="mx-auto w-full max-w-3xl space-y-4">
             {messages.map((m) => (
               <div key={m.id} className="space-y-2">

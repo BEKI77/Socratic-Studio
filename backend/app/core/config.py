@@ -13,7 +13,7 @@ print(f"-----------------------------")
 
 class Settings(BaseSettings):
     DATABASE_URL: str
-    hf_token: str
+    HF_TOKEN: str
     model_api_url: str
     
     model_config = SettingsConfigDict(

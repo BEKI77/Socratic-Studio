@@ -45,25 +45,58 @@ def search_documents_db(query: str, top_k: int = 4) -> List[Document]:
     # embedding the 'query' string and performing the vector search
     return vector_store.similarity_search(query, k=top_k)
 
-def list_documents_db() -> List[str]:
+def get_document_chunks(source_name: str) -> List[dict]:
+    """
+    Retrieves all chunks belonging to a specific document source.
+    """
+    try:
+        # Use a filter to search only within the specified source
+        filter_doc = Document(
+            page_content="",
+            metadata={"source": source_name}
+        )
+        results = vector_store.similarity_search(
+            "", 
+            k=100,
+            filter={"source": source_name}
+        )
+        
+        chunks = [
+            {
+                "content": doc.page_content,
+                "chunkIndex": i,
+                "source": doc.metadata.get("source", "Unknown"),
+                "page": doc.metadata.get("page", None),
+            }
+            for i, doc in enumerate(results)
+        ]
+        return chunks
+    except Exception as e:
+        print(f"Error fetching document chunks: {e}")
+        return []
+
+def list_documents_db() -> List[dict]:
     """
     Retrieves a list of unique document names/sources currently stored 
-    in the vector database.
+    in the vector database, along with their chunk counts.
     """
     try:
         # We perform a broad search to find documents. 
         # Note: If you have thousands of docs, you might prefer a direct SQL query.
-        # This approach retrieves the most recent/relevant chunks and extracts unique source names.
         all_docs = vector_store.similarity_search("", k=100) 
         
-        # Extract the 'source' or 'filename' from metadata
-        # We use a set to ensure names are unique
-        unique_sources: Set[str] = {
-            doc.metadata.get("source", "Unknown Source") 
-            for doc in all_docs
-        }
+        # Group by source name and count chunks
+        source_chunks: dict[str, int] = {}
+        for doc in all_docs:
+            source = doc.metadata.get("source", "Unknown Source")
+            source_chunks[source] = source_chunks.get(source, 0) + 1
         
-        return sorted(list(unique_sources))
+        # Build document objects matching frontend's DocumentSummary interface
+        documents = [
+            {"id": str(i), "name": name, "chunkCount": count}
+            for i, (name, count) in enumerate(sorted(source_chunks.items()))
+        ]
+        return documents
     except Exception as e:
         print(f"Error listing documents: {e}")
         return []

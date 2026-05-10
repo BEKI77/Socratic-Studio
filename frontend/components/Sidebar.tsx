@@ -9,8 +9,10 @@ import {
   Clock,
   FolderIcon,
   FileText,
+  BookOpen,
   Settings,
   Asterisk,
+  Loader2,
 } from "lucide-react"
 import SidebarSection from "./SidebarSection"
 import ConversationRow from "./ConversationRow"
@@ -24,11 +26,8 @@ import SettingsPopover from "./SettingsPopover"
 import { cls, makeId } from "./utils"
 import { useEffect, useState, useRef } from "react"
 import type {
-  Message,
   Conversation,
   Template,
-  Folder,
-  Document,
   CollapsedState,
   SidebarProps
 } from "../types/types"
@@ -62,6 +61,7 @@ export default function Sidebar({
   uploadStatus = "",
   isUploading = false,
   onUpload = () => { },
+  onDocumentClick = () => { },
 }: SidebarProps) {
   const [isDesktop, setIsDesktop] = useState(() => {
     if (typeof window === "undefined") return true
@@ -131,35 +131,15 @@ export default function Sidebar({
     setEditingTemplate(null)
   }
 
-  const handleEditTemplate = (template: Template) => {
-    setEditingTemplate(template)
-    setShowCreateTemplateModal(true)
-  }
-
-  const handleRenameTemplate = (templateId: string, newName: string) => {
-    const updatedTemplates = templates.map((t: Template) =>
-      t.id === templateId ? { ...t, name: newName, updatedAt: new Date().toISOString() } : t,
-    )
-    setTemplates(updatedTemplates)
-  }
-
-  const handleDeleteTemplate = (templateId: string) => {
-    const updatedTemplates = templates.filter((t: Template) => t.id !== templateId)
-    setTemplates(updatedTemplates)
-  }
-
-  const handleUseTemplate = (template: Template) => {
-    onUseTemplate(template)
-  }
 
   if (sidebarCollapsed) {
     return (
       <>
         <motion.aside
-          initial={{ width: 320 }}
-          animate={{ width: 64 }}
+          initial={{ width: "auto" }}
+          animate={{ width: sidebarCollapsed ? 64 : "auto" }}
           transition={{ type: "spring", stiffness: 260, damping: 28 }}
-          className="z-50 flex h-full shrink-0 flex-col border-r border-border bg-sidebar dark:border-border dark:bg-sidebar"
+          className="z-50 flex h-full w-full shrink-0 flex-col border-r border-border bg-sidebar dark:border-border dark:bg-sidebar"
         >
           <div className="flex items-center justify-center border-b border-border px-3 py-3 dark:border-border">
             <button
@@ -247,178 +227,98 @@ export default function Sidebar({
             exit={{ x: "-100%" }}
             transition={{ type: "spring", stiffness: 260, damping: 28 }}
             className={cls(
-              "z-50 flex h-full w-[min(20rem,88vw)] shrink-0 flex-col border-r border-border bg-sidebar/85 backdrop-blur dark:border-border dark:bg-sidebar/80 sm:w-80",
-              "fixed inset-y-0 left-0 md:static md:translate-x-0",
+              "z-50 flex h-full w-full shrink-0 flex-col bg-background/40 backdrop-blur-3xl",
+              "fixed inset-y-0 left-0 md:static md:translate-x-0 md:bg-transparent md:border-none",
             )}
           >
-            <div className="flex items-center gap-2 border-b border-border px-3 py-3 dark:border-border">
-              <div className="flex items-center gap-2">
-                <div className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary text-primary-foreground shadow-sm dark:from-primary dark:to-primary dark:text-primary-foreground">
-                  <Asterisk className="h-4 w-4" />
+            {/* Minimal Header */}
+            <div className="flex items-center justify-between px-6 py-6">
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
+                  <Asterisk className="h-5 w-5" />
                 </div>
-                <div className="text-sm font-semibold tracking-tight">Socratic Studio</div>
+                <span className="text-lg font-bold tracking-tight text-gradient">Socratic</span>
               </div>
-              <div className="ml-auto flex items-center gap-1">
-                <button
-                  onClick={() => setSidebarCollapsed(true)}
-                  className="hidden md:block rounded-xl p-2 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:hover:bg-accent"
-                  aria-label="Close sidebar"
-                  title="Close sidebar"
-                >
-                  <PanelLeftClose className="h-5 w-5" />
-                </button>
-
-                <button
-                  onClick={onClose}
-                  className="md:hidden rounded-xl p-2 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:hover:bg-accent"
-                  aria-label="Close sidebar"
-                >
-                  <PanelLeftClose className="h-5 w-5" />
-                </button>
-              </div>
+              <button
+                onClick={isDesktop ? () => setSidebarCollapsed(true) : onClose}
+                className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-accent/50 transition-colors text-muted-foreground"
+              >
+                <PanelLeftClose className="h-4 w-4" />
+              </button>
             </div>
 
-            <div className="px-3 pt-3">
-              <label htmlFor="search" className="sr-only">
-                Search conversations
-              </label>
-              <div className="relative">
-                <SearchIcon className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            {/* Main Action Area */}
+            <div className="px-4 space-y-3 mb-6">
+              <button
+                onClick={createNewChat}
+                className="group relative flex w-full items-center gap-3 rounded-2xl bg-primary px-5 py-3 text-[14px] font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <Plus className="h-4 w-4" />
+                <span>New Session</span>
+              </button>
+
+              <div className="relative group">
+                <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                 <input
-                  id="search"
-                  ref={searchRef}
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search…"
-                  onClick={() => setShowSearchModal(true)}
+                  placeholder="Quick search..."
                   onFocus={() => setShowSearchModal(true)}
-                  className="w-full rounded-full border border-input bg-background py-2 pl-9 pr-3 text-sm outline-none ring-0 placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring dark:border-input dark:bg-background"
+                  className="w-full h-11 rounded-xl bg-accent/30 border-none pl-11 pr-4 text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                 />
               </div>
             </div>
 
-            <div className="px-3 pt-3">
-              <button
-                onClick={createNewChat}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:bg-primary dark:text-primary-foreground"
-                title="New Chat (⌘N)"
-              >
-                <Plus className="h-4 w-4" /> Start New Chat
-              </button>
-            </div>
-
-            <div className="px-3 pt-3">
-              <div className="rounded-2xl border border-border bg-card p-3 shadow-sm dark:border-border dark:bg-card">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-xs uppercase tracking-wide text-muted-foreground dark:text-muted-foreground">
-                      Knowledge base
-                    </div>
-                    <div className="text-sm font-semibold">Upload notes</div>
-                  </div>
-                  <span className="rounded-full border border-border px-2 py-0.5 text-[10px] text-muted-foreground dark:border-border dark:text-muted-foreground">
-                    PDF · TXT · TEX
-                  </span>
-                </div>
-                <p className="mt-2 text-xs text-muted-foreground dark:text-muted-foreground">{uploadStatus}</p>
-                <div className="mt-3">
-                  <input
-                    id="doc-upload"
-                    type="file"
-                    accept=".pdf,.txt,.tex"
-                    className="sr-only"
-                    onChange={onUpload}
-                    disabled={isUploading}
-                  />
-                  <label
-                    htmlFor="doc-upload"
-                    className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-background px-3 py-1.5 text-xs font-semibold text-foreground shadow-sm hover:bg-accent dark:bg-background dark:text-foreground dark:hover:bg-accent"
-                  >
-                    <Plus className="h-3.5 w-3.5" /> {isUploading ? "Uploading..." : "Add material"}
-                  </label>
-                </div>
-                <div className="mt-3 space-y-1">
-                  {documents.length === 0 ? (
-                    <p className="text-xs text-muted-foreground">No documents indexed yet.</p>
-                  ) : (
-                    documents.slice(0, 3).map((doc) => (
-                      <div
-                        key={doc.id}
-                        className="flex items-center justify-between rounded-lg border border-border bg-card px-2.5 py-1.5 text-xs text-muted-foreground dark:border-border dark:bg-card dark:text-muted-foreground"
-                      >
-                        <span className="truncate">{doc.name}</span>
-                        <span className="text-[10px] text-muted-foreground">{doc.chunkCount} chunks</span>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <nav className="mt-4 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-2 pb-4">
-              <SidebarSection
-                icon={<Star className="h-4 w-4" />}
-                title="PINNED CHATS"
-                collapsed={collapsed.pinned}
-                onToggle={() => setCollapsed((s: CollapsedState) => ({ ...s, pinned: !s.pinned }))}
-              >
-                {pinned.length === 0 ? (
-                  <div className="select-none rounded-lg border border-dashed border-border px-3 py-3 text-center text-xs text-muted-foreground dark:border-border dark:text-muted-foreground">
-                    Pin important threads for quick access.
-                  </div>
-                ) : (
-                  pinned.map((c: Conversation) => (
-                    <ConversationRow
-                      key={c.id}
-                      data={c}
-                      active={c.id === selectedId}
-                      onSelect={() => onSelect(c.id)}
-                      onTogglePin={() => togglePin(c.id)}
-                    />
-                  ))
-                )}
-              </SidebarSection>
-
+            {/* Scrollable Content */}
+            <nav className="flex-1 overflow-y-auto px-2 space-y-2 pb-6 custom-scrollbar">
+              {/* Consolidated Conversations */}
               <SidebarSection
                 icon={<Clock className="h-4 w-4" />}
-                title="RECENT"
+                title="History"
                 collapsed={collapsed.recent}
-                onToggle={() => setCollapsed((s: CollapsedState) => ({ ...s, recent: !s.recent }))}
+                onToggle={() => setCollapsed(s => ({ ...s, recent: !s.recent }))}
               >
-                {recent.length === 0 ? (
-                  <div className="select-none rounded-lg border border-dashed border-border px-3 py-3 text-center text-xs text-muted-foreground dark:border-border dark:text-muted-foreground">
-                    No conversations yet. Start a new one!
-                  </div>
-                ) : (
-                  recent.map((c: Conversation) => (
+                <div className="space-y-1">
+                  {pinned.map((c) => (
                     <ConversationRow
                       key={c.id}
                       data={c}
                       active={c.id === selectedId}
                       onSelect={() => onSelect(c.id)}
                       onTogglePin={() => togglePin(c.id)}
-                      showMeta
                     />
-                  ))
-                )}
+                  ))}
+                  {recent.map((c) => (
+                    <ConversationRow
+                      key={c.id}
+                      data={c}
+                      active={c.id === selectedId}
+                      onSelect={() => onSelect(c.id)}
+                      onTogglePin={() => togglePin(c.id)}
+                    />
+                  ))}
+                  {conversations.length === 0 && (
+                    <p className="px-4 py-3 text-xs text-muted-foreground/60 italic text-center">No history yet</p>
+                  )}
+                </div>
               </SidebarSection>
 
+              {/* Collections / Folders */}
               <SidebarSection
                 icon={<FolderIcon className="h-4 w-4" />}
-                title="FOLDERS"
+                title="Collections"
                 collapsed={collapsed.folders}
-                onToggle={() => setCollapsed((s: CollapsedState) => ({ ...s, folders: !s.folders }))}
+                onToggle={() => setCollapsed(s => ({ ...s, folders: !s.folders }))}
               >
-                <div className="-mx-1">
+                <div className="space-y-1">
                   <button
                     onClick={() => setShowCreateFolderModal(true)}
-                    className="mb-2 inline-flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm text-muted-foreground hover:bg-accent dark:text-muted-foreground dark:hover:bg-accent"
+                    className="flex w-full items-center gap-3 px-4 py-2 text-xs font-bold text-muted-foreground/70 hover:text-primary transition-colors"
                   >
-                    <Plus className="h-4 w-4" /> Create folder
+                    <Plus className="h-3.5 w-3.5" /> New Collection
                   </button>
-
-                  {folders.map((f: Folder) => (
+                  {folders.map((f) => (
                     <FolderRow
                       key={f.id}
                       name={f.name}
@@ -434,64 +334,70 @@ export default function Sidebar({
                 </div>
               </SidebarSection>
 
+              {/* Resources / Knowledge Base */}
               <SidebarSection
-                icon={<FileText className="h-4 w-4" />}
-                title="TEMPLATES"
-                collapsed={collapsed.templates}
-                onToggle={() => setCollapsed((s: CollapsedState) => ({ ...s, templates: !s.templates }))}
+                icon={<BookOpen className="h-4 w-4" />}
+                title="Library"
+                collapsed={collapsed.templates} // Reusing state for Library
+                onToggle={() => setCollapsed(s => ({ ...s, templates: !s.templates }))}
               >
-                <div className="-mx-1">
-                  <button
-                    onClick={() => setShowCreateTemplateModal(true)}
-                    className="mb-2 inline-flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm text-muted-foreground hover:bg-accent dark:text-muted-foreground dark:hover:bg-accent"
-                  >
-                    <Plus className="h-4 w-4" /> Create template
-                  </button>
-
-                  {(Array.isArray(templates) ? templates : []).map((template: Template) => (
-                    <TemplateRow
-                      key={template.id}
-                      template={template}
-                      onUseTemplate={handleUseTemplate}
-                      onEditTemplate={handleEditTemplate}
-                      onRenameTemplate={handleRenameTemplate}
-                      onDeleteTemplate={handleDeleteTemplate}
+                <div className="px-2 space-y-3">
+                  <div className="relative">
+                    <input
+                      id="doc-upload"
+                      type="file"
+                      accept=".pdf,.txt"
+                      className="sr-only"
+                      onChange={onUpload}
+                      disabled={isUploading}
                     />
-                  ))}
-
-                  {(!templates || templates.length === 0) && (
-                    <div className="select-none rounded-lg border border-dashed border-border px-3 py-3 text-center text-xs text-muted-foreground dark:border-border dark:text-muted-foreground">
-                      No templates yet. Create your first prompt template.
-                    </div>
-                  )}
+                    <label
+                      htmlFor="doc-upload"
+                      className="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-accent/40 py-2 text-[11px] font-bold hover:bg-accent transition-colors"
+                    >
+                      {isUploading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
+                      Add Document
+                    </label>
+                  </div>
+                  <div className="space-y-1">
+                    {documents.map((doc, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => onDocumentClick(doc.name)}
+                        className="flex w-full items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-accent/30 text-[11px] text-muted-foreground group text-left transition-colors"
+                      >
+                        <FileText className="h-3 w-3 shrink-0" />
+                        <span className="truncate flex-1">{doc.name}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </SidebarSection>
             </nav>
 
-            <div className="mt-auto border-t border-border px-3 py-3 dark:border-border">
-              <div className="flex items-center gap-2">
+            {/* Bottom Section - Minimal Profile */}
+            <div className="px-4 py-4 border-t border-border/20 bg-background/20 backdrop-blur-xl">
+              <div className="flex items-center justify-between">
                 <SettingsPopover>
-                  <button className="inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:hover:bg-accent">
-                    <Settings className="h-4 w-4" /> Settings
+                  <button className="flex items-center gap-3 group transition-all">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary/80 to-primary text-[12px] font-bold text-white shadow-lg shadow-primary/20">
+                      ST
+                    </div>
+                    <div className="text-left">
+                      <div className="text-[13px] font-bold text-foreground">Student</div>
+                      <div className="text-[10px] text-muted-foreground/60 uppercase tracking-widest font-bold">Workspace</div>
+                    </div>
                   </button>
                 </SettingsPopover>
-                <div className="ml-auto">
+                <div className="flex items-center gap-1">
                   <ThemeToggle theme={theme} setTheme={setTheme} />
-                </div>
-              </div>
-              <div className="mt-2 flex items-center gap-2 rounded-xl bg-card p-2 dark:bg-card">
-                <div className="grid h-8 w-8 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground dark:bg-primary dark:text-primary-foreground">
-                  ST
-                </div>
-                <div className="min-w-0">
-                  <div className="truncate text-sm font-medium">Student</div>
-                  <div className="truncate text-xs text-muted-foreground dark:text-muted-foreground">Study workspace</div>
                 </div>
               </div>
             </div>
           </motion.aside>
         )}
       </AnimatePresence>
+
 
       <CreateFolderModal
         isOpen={showCreateFolderModal}

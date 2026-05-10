@@ -1,6 +1,6 @@
 import type { ChatMessage, DocumentSummary } from "@/lib/types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000/api/v1";
 
 async function parseJson(response: Response) {
   const payload = await response.json();
@@ -14,7 +14,9 @@ async function parseJson(response: Response) {
 export async function fetchDocuments(): Promise<DocumentSummary[]> {
   try {
     const response = await fetch(`${API_BASE_URL}/documents`);
+    
     const payload = await parseJson(response);
+    console.log(payload);
     return payload.documents ?? [];
   } catch {
     return [];
@@ -31,6 +33,14 @@ export async function uploadDocument(file: File): Promise<DocumentSummary> {
   });
 
   return parseJson(response);
+}
+
+export async function fetchDocumentChunks(source: string) {
+  const response = await fetch(`${API_BASE_URL}/documents/${encodeURIComponent(source)}`);
+  return parseJson(response) as Promise<{
+    source: string;
+    chunks: { content: string; chunkIndex: number; source: string; page: number | null }[];
+  }>;
 }
 
 export async function askQuestion(question: string) {
