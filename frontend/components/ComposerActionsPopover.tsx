@@ -2,9 +2,10 @@
 import { useState } from "react"
 import { Paperclip, Bot, Search, Palette, BookOpen, MoreHorizontal, Globe, ChevronRight } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
+import React from "react"
 
 interface Action {
-  icon: React.ComponentType<{ className?: string }> | React.ReactNode
+  icon: React.ReactElement | React.ElementType
   label: string
   action: () => void
   badge?: string
@@ -108,6 +109,13 @@ export default function ComposerActionsPopover({ children }: ComposerActionsPopo
     }
   }
 
+  const renderIcon = (icon: Action["icon"]) => {
+    if (React.isValidElement(icon)) return icon
+
+    const Icon = icon as React.ElementType
+    return <Icon className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
+  }
+
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>{children}</PopoverTrigger>
@@ -117,19 +125,14 @@ export default function ComposerActionsPopover({ children }: ComposerActionsPopo
             <div className="space-y-0.5">
               {mainActions.map((action, index) => {
                 const IconComponent = action.icon
+
                 return (
                   <button
                     key={index}
                     onClick={() => handleAction(action.action)}
                     className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-left hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                   >
-                    {typeof IconComponent === 'function' && 'className' in IconComponent ? (
-                      <IconComponent className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
-                    ) : typeof IconComponent === 'function' ? (
-                      <IconComponent />
-                    ) : (
-                      IconComponent
-                    )}
+                    {renderIcon(IconComponent)}
                     <span>{action.label}</span>
                     {action.badge && (
                       <span className="ml-auto px-2 py-0.5 text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 rounded-full font-medium">
@@ -156,19 +159,14 @@ export default function ComposerActionsPopover({ children }: ComposerActionsPopo
               <div className="space-y-0.5">
                 {mainActions.map((action, index) => {
                   const IconComponent = action.icon
+
                   return (
                     <button
                       key={index}
                       onClick={() => handleAction(action.action)}
                       className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-left hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                     >
-                      {typeof IconComponent === 'function' && 'className' in IconComponent ? (
-                        <IconComponent className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
-                      ) : typeof IconComponent === 'function' ? (
-                        <IconComponent />
-                      ) : (
-                        IconComponent
-                      )}
+                      {renderIcon(IconComponent)}
                       <span>{action.label}</span>
                       {action.badge && (
                         <span className="ml-auto px-2 py-0.5 text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 rounded-full font-medium">
@@ -199,11 +197,7 @@ export default function ComposerActionsPopover({ children }: ComposerActionsPopo
                       onClick={() => handleAction(action.action)}
                       className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-left hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                     >
-                      {typeof IconComponent === "function" ? (
-                        <IconComponent className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
-                      ) : (
-                        IconComponent
-                      )}
+                    {renderIcon(IconComponent)}
                       <span>{action.label}</span>
                     </button>
                   )
