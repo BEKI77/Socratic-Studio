@@ -310,9 +310,11 @@ export default function AIAssistantUI() {
 
   const selected = conversations.find((c) => c.id === selectedId) || null
 
-  async function handleUpload(event: React.ChangeEvent<HTMLInputElement>): Promise<void> {
-    const file = event.target.files?.[0]
-    if (!file) return
+  const handleRemoveDocument = (id: string) => {
+    setDocuments((prev) => prev.filter((doc) => doc.id !== id))
+  }
+
+  async function handleUploadFile(file: File): Promise<void> {
     setIsUploading(true)
     setUploadStatus("Indexing your material...")
 
@@ -325,8 +327,14 @@ export default function AIAssistantUI() {
       setUploadStatus(message)
     } finally {
       setIsUploading(false)
-      event.target.value = ""
     }
+  }
+
+  async function handleUpload(event: React.ChangeEvent<HTMLInputElement>): Promise<void> {
+    const file = event.target.files?.[0]
+    if (!file) return
+    await handleUploadFile(file)
+    event.target.value = ""
   }
 
   return (
@@ -397,6 +405,9 @@ export default function AIAssistantUI() {
               ref={composerRef}
               conversation={selected}
               onSend={async (content: string) => { if (selected) await sendMessage(selected.id, content) }}
+              onUploadFile={handleUploadFile}
+              onRemoveDocument={handleRemoveDocument}
+              documents={documents}
               onEditMessage={(messageId, newContent) => selected && editMessage(selected.id, messageId, newContent)}
               onResendMessage={(messageId) => selected && resendMessage(selected.id, messageId)}
               isThinking={isThinking && thinkingConvId === selected?.id}

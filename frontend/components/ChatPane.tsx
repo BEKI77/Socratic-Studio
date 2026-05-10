@@ -5,6 +5,7 @@ import { Pencil, RefreshCw, Check, X, Square } from "lucide-react"
 import Message from "./Message"
 import Composer from "./Composer"
 import { cls, timeAgo } from "./utils"
+import type { Document } from "../types/types"
 
 interface ThinkingMessageProps {
   onPause: () => void
@@ -37,6 +38,9 @@ interface Conversation {
 interface ChatPaneProps {
   conversation: Conversation | null
   onSend?: (content: string) => Promise<void>
+  onUploadFile?: (file: File) => Promise<void> | void
+  onRemoveDocument?: (id: string) => void
+  documents?: Document[]
   onEditMessage?: (messageId: string, newContent: string) => void
   onResendMessage?: (messageId: string) => void
   isThinking: boolean
@@ -69,7 +73,7 @@ function ThinkingMessage({ onPause }: ThinkingMessageProps) {
 }
 
 const ChatPane = forwardRef<ChatPaneRef, ChatPaneProps>(function ChatPane(
-  { conversation, onSend, onEditMessage, onResendMessage, isThinking, onPauseThinking },
+  { conversation, onSend, onUploadFile, onRemoveDocument, documents, onEditMessage, onResendMessage, isThinking, onPauseThinking },
   ref: ForwardedRef<ChatPaneRef>,
 ) {
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -226,6 +230,9 @@ const ChatPane = forwardRef<ChatPaneRef, ChatPaneProps>(function ChatPane(
           await onSend?.(text)
           setBusy(false)
         }}
+        onUploadFile={onUploadFile}
+        onRemoveDocument={onRemoveDocument}
+        documents={documents}
         busy={busy}
       />
     </div>
