@@ -15,9 +15,6 @@ class StoredDocument:
     chunks: List[ChunkRecord]
 
 
-_DOCUMENTS: List[StoredDocument] = []
-
-
 def _create_chunk_record(document_id: str, document_name: str, text: str) -> ChunkRecord:
     tokens = tokenize(text)
     return ChunkRecord(
@@ -65,5 +62,3 @@ def search_documents(query: str, top_k: int = 4) -> List[ChunkRecord]:
     ]
 
 
-def reset_documents():
-    _DOCUMENTS.clear()

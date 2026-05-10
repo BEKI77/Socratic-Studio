@@ -12,22 +12,23 @@ interface SidebarSectionProps {
 
 export default function SidebarSection({ icon, title, children, collapsed, onToggle }: SidebarSectionProps) {
   return (
-    <section>
+    <section className="mb-4">
       <button
         onClick={onToggle}
-        className="sticky top-0 z-10 -mx-2 mb-1 flex w-[calc(100%+16px)] items-center gap-2 border-y border-transparent bg-gradient-to-b from-background to-background/70 px-2 py-2 text-[11px] font-semibold tracking-wide text-muted-foreground backdrop-blur hover:text-foreground dark:from-background dark:to-background/70 dark:hover:text-foreground"
+        className="flex w-full items-center justify-between px-4 py-2 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 hover:text-primary transition-colors group"
         aria-expanded={!collapsed}
       >
-        <span className="mr-1" aria-hidden>
-          {collapsed ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-        </span>
-        <span className="flex items-center gap-2">
-          <span className="opacity-70" aria-hidden>
+        <span className="flex items-center gap-3">
+          <span className="opacity-70 group-hover:scale-110 transition-transform" aria-hidden>
             {icon}
           </span>
           {title}
         </span>
+        <span className="opacity-50" aria-hidden>
+          {collapsed ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+        </span>
       </button>
+
       <AnimatePresence initial={false}>
         {!collapsed && (
           <motion.div

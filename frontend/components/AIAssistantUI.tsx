@@ -18,7 +18,8 @@ import GhostIconButton from "./GhostIconButton"
 import ThemeToggle from "./ThemeToggle"
 import { INITIAL_TEMPLATES } from "./mockData"
 import { askQuestion, fetchDocuments, uploadDocument } from "@/lib/api"
-import { makeId } from "./utils"
+import DocumentModal from "./DocumentModal"
+import { cls, makeId } from "./utils"
 
 const createSessionConversation = (): Conversation => ({
   id: makeId("c"),
@@ -32,6 +33,12 @@ const createSessionConversation = (): Conversation => ({
 })
 
 const INITIAL_FOLDERS: Folder[] = [{ id: "f1", name: "Study Sessions" }]
+
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable"
 
 export default function AIAssistantUI() {
   const [theme, setTheme] = useState<"light" | "dark">(() => {
@@ -110,6 +117,14 @@ export default function AIAssistantUI() {
 
   const [isThinking, setIsThinking] = useState<boolean>(false)
   const [thinkingConvId, setThinkingConvId] = useState<string | null>(null)
+
+  const [docModalOpen, setDocModalOpen] = useState<boolean>(false)
+  const [selectedDocName, setSelectedDocName] = useState<string>("")
+
+  function handleDocumentClick(documentName: string): void {
+    setSelectedDocName(documentName)
+    setDocModalOpen(true)
+  }
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -331,80 +346,100 @@ export default function AIAssistantUI() {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-background text-foreground p-0 m-0">
-      <div className="pointer-events-none absolute inset-0 bg-hero-grid opacity-70" />
-      <div className="pointer-events-none absolute -top-24 left-1/2 h-72 w-[85rem] -translate-x-1/2 rounded-full bg-gradient-to-r from-accent/50 via-background/40 to-accent/40 blur-3xl dark:from-background/40 dark:via-background/20 dark:to-background/40" />
+      {/* Decorative Background Elements */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,oklch(0.62_0.18_25_/_0.15),transparent_70%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-hero-grid opacity-[0.03] dark:opacity-[0.05]" />
+      <div className="pointer-events-none absolute top-[-40%] left-1/2 h-250 w-250 -translate-x-1/2 rounded-full bg-primary/5 blur-[120px]" />
+
       <div className="relative flex min-h-screen flex-col">
-        <div className="md:hidden sticky top-0 z-40 flex items-center gap-2 border-b border-border bg-sidebar/70 px-4 py-2.5 backdrop-blur dark:border-border dark:bg-sidebar/70">
+        <div className="md:hidden sticky top-0 z-40 flex items-center gap-2 border-b border-border/50 bg-background/80 px-4 py-3 backdrop-blur-xl">
           <button
             onClick={() => setSidebarOpen((prev) => !prev)}
-            className="inline-flex items-center justify-center rounded-lg p-2 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:hover:bg-accent"
+            className="inline-flex items-center justify-center rounded-xl p-2 hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
           >
             <Menu className="h-5 w-5" />
           </button>
-          <div className="flex items-center gap-2 text-sm font-semibold tracking-tight">
-            <span className="inline-flex h-4 w-4 items-center justify-center">✱</span> Socratic Studio
+          <div className="flex items-center gap-2 text-sm font-bold tracking-tight">
+            <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-lg shadow-primary/20">
+              <span className="text-xs">✱</span>
+            </div>
+            <span className="text-gradient">Socratic Studio</span>
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <GhostIconButton label="Schedule">
-              <Calendar className="h-4 w-4" />
-            </GhostIconButton>
-            <GhostIconButton label="Apps">
-              <LayoutGrid className="h-4 w-4" />
-            </GhostIconButton>
-            <GhostIconButton label="More">
-              <MoreHorizontal className="h-4 w-4" />
-            </GhostIconButton>
             <ThemeToggle theme={theme} setTheme={setTheme} />
           </div>
         </div>
 
-        <div className="mx-auto flex w-full h-screen  px-0 ">
-          <Sidebar
-            open={sidebarOpen}
-            onClose={() => setSidebarOpen(false)}
-            theme={theme}
-            setTheme={setTheme}
-            collapsed={collapsed}
-            setCollapsed={setCollapsed}
-            sidebarCollapsed={sidebarCollapsed}
-            setSidebarCollapsed={setSidebarCollapsed}
-            conversations={conversations}
-            pinned={pinned}
-            recent={recent}
-            folders={folders}
-            folderCounts={folderCounts}
-            selectedId={selectedId}
-            onSelect={(id: string) => setSelectedId(id)}
-            togglePin={togglePin}
-            query={query}
-            setQuery={setQuery}
-            searchRef={searchRef}
-            createFolder={createFolder}
-            createNewChat={createNewChat}
-            templates={templates}
-            setTemplates={setTemplates}
-            onUseTemplate={handleUseTemplate}
-            documents={documents}
-            uploadStatus={uploadStatus}
-            isUploading={isUploading}
-            onUpload={handleUpload}
-          />
+        <div className="mx-auto flex w-full h-screen overflow-hidden px-0 md:p-4 lg:p-6">
+          <ResizablePanelGroup direction="horizontal" className="h-full w-full">
+            <ResizablePanel
+              defaultSize={20}
+              minSize={sidebarCollapsed ? 4 : 15}
+              maxSize={30}
+              className={cls(
+                "hidden md:block h-full transition-all duration-300",
+                sidebarCollapsed ? "max-w-16" : ""
+              )}
+            >
+              <Sidebar
+                open={sidebarOpen}
+                onClose={() => setSidebarOpen(false)}
+                theme={theme}
+                setTheme={setTheme}
+                collapsed={collapsed}
+                setCollapsed={setCollapsed}
+                sidebarCollapsed={sidebarCollapsed}
+                setSidebarCollapsed={setSidebarCollapsed}
+                conversations={conversations}
+                pinned={pinned}
+                recent={recent}
+                folders={folders}
+                folderCounts={folderCounts}
+                selectedId={selectedId}
+                onSelect={(id: string) => setSelectedId(id)}
+                togglePin={togglePin}
+                query={query}
+                setQuery={setQuery}
+                searchRef={searchRef}
+                createFolder={createFolder}
+                createNewChat={createNewChat}
+                templates={templates}
+                setTemplates={setTemplates}
+                onUseTemplate={handleUseTemplate}
+                documents={documents}
+                uploadStatus={uploadStatus}
+                isUploading={isUploading}
+                onUpload={handleUpload}
+                onDocumentClick={handleDocumentClick}
+              />
+            </ResizablePanel>
 
-          <main className="relative flex min-w-0 flex-1 flex-col md:rounded-[28px] md:border md:border-border md:bg-sidebar/70 md:shadow-soft md:backdrop-blur dark:md:border-border dark:md:bg-sidebar/60">
-            <Header createNewChat={createNewChat} sidebarCollapsed={sidebarCollapsed} setSidebarOpen={setSidebarOpen} />
-            <ChatPane
-              ref={composerRef}
-              conversation={selected}
-              onSend={async (content: string) => { if (selected) await sendMessage(selected.id, content) }}
-              onEditMessage={(messageId, newContent) => selected && editMessage(selected.id, messageId, newContent)}
-              onResendMessage={(messageId) => selected && resendMessage(selected.id, messageId)}
-              isThinking={isThinking && thinkingConvId === selected?.id}
-              onPauseThinking={pauseThinking}
-            />
-          </main>
+            <ResizableHandle className="hidden md:flex" />
+
+            <ResizablePanel defaultSize={80}>
+              <main className="relative flex h-full min-w-0 flex-col overflow-hidden glass md:rounded-4xl">
+                <Header createNewChat={createNewChat} sidebarCollapsed={sidebarCollapsed} setSidebarOpen={setSidebarOpen} />
+                <ChatPane
+                  ref={composerRef}
+                  conversation={selected}
+                  onSend={async (content: string) => { if (selected) await sendMessage(selected.id, content) }}
+                  onEditMessage={(messageId, newContent) => selected && editMessage(selected.id, messageId, newContent)}
+                  onResendMessage={(messageId) => selected && resendMessage(selected.id, messageId)}
+                  isThinking={isThinking && thinkingConvId === selected?.id}
+                  onPauseThinking={pauseThinking}
+                />
+              </main>
+            </ResizablePanel>
+          </ResizablePanelGroup>
         </div>
       </div>
+
+      <DocumentModal
+        isOpen={docModalOpen}
+        onClose={() => setDocModalOpen(false)}
+        documentName={selectedDocName}
+      />
     </div>
   )
 }

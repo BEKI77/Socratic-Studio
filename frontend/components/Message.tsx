@@ -1,29 +1,30 @@
 import { cls } from "./utils"
+import { User, Sparkles } from "lucide-react"
+import type { MessageProps } from "../types/types"
 
-export default function Message({ role, children }) {
+export default function Message({ role, children }: MessageProps) {
   const isUser = role === "user"
   return (
-    <div className={cls("flex gap-3", isUser ? "justify-end" : "justify-start")}>
-      {!isUser && (
-        <div className="mt-0.5 grid h-7 w-7 place-items-center rounded-full bg-zinc-900 text-[10px] font-bold text-white dark:bg-white dark:text-zinc-900">
-          AI
-        </div>
-      )}
+    <div className={cls("flex gap-4 animate-in fade-in slide-in-from-bottom-2 duration-500", isUser ? "flex-row-reverse" : "flex-row")}>
+      <div className={cls(
+        "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl shadow-lg",
+        isUser 
+          ? "bg-primary text-primary-foreground" 
+          : "bg-white dark:bg-zinc-800 text-foreground border border-border/50"
+      )}>
+        {isUser ? <User className="h-4 w-4" /> : <Sparkles className="h-4 w-4 text-primary animate-pulse" />}
+      </div>
+      
       <div
         className={cls(
-          "max-w-[92%] sm:max-w-[80%] rounded-2xl px-3 py-2 text-sm shadow-sm",
+          "max-w-[85%] rounded-[24px] px-5 py-3.5 text-[15px] leading-relaxed shadow-soft",
           isUser
-            ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
-            : "bg-white/90 text-zinc-900 dark:bg-zinc-900/90 dark:text-zinc-100 border border-zinc-200/70 dark:border-zinc-800",
+            ? "bg-primary text-primary-foreground rounded-tr-none"
+            : "glass dark:bg-zinc-900/60 text-foreground rounded-tl-none border-border/40"
         )}
       >
         {children}
       </div>
-      {isUser && (
-        <div className="mt-0.5 grid h-7 w-7 place-items-center rounded-full bg-zinc-900 text-[10px] font-bold text-white dark:bg-white dark:text-zinc-900">
-          ME
-        </div>
-      )}
     </div>
   )
 }

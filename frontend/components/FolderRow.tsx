@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import { FolderIcon, ChevronRight, ChevronDown, MoreHorizontal } from "lucide-react"
 import ConversationRow from "./ConversationRow"
 import { motion, AnimatePresence } from "framer-motion"
+import { cls } from "./utils"
 import type { FolderRowProps } from "../types/types"
 
 export default function FolderRow({ name, count, conversations, selectedId, onSelect, togglePin, onDeleteFolder, onRenameFolder }: FolderRowProps) {
@@ -52,19 +53,21 @@ export default function FolderRow({ name, count, conversations, selectedId, onSe
 
   return (
     <div className="group">
-      <div className="flex items-center justify-between rounded-lg px-2 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800">
-        <button onClick={handleToggle} className="flex items-center gap-2 flex-1 text-left">
-          {isExpanded ? (
-            <ChevronDown className="h-4 w-4 text-zinc-500" />
-          ) : (
-            <ChevronRight className="h-4 w-4 text-zinc-500" />
-          )}
-          <FolderIcon className="h-4 w-4" />
-          <span className="truncate">{name}</span>
-        </button>
+      <div className="flex items-center justify-between rounded-2xl px-4 py-3 text-sm hover:bg-accent/50 transition-colors cursor-pointer group/row" onClick={handleToggle}>
+        <div className="flex items-center gap-3 flex-1 text-left">
+          <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-accent/50 text-muted-foreground group-hover/row:text-primary transition-colors">
+            {isExpanded ? (
+              <ChevronDown className="h-3.5 w-3.5" />
+            ) : (
+              <ChevronRight className="h-3.5 w-3.5" />
+            )}
+          </div>
+          <FolderIcon className={cls("h-4 w-4 transition-colors", isExpanded ? "text-primary" : "text-muted-foreground")} />
+          <span className={cls("truncate font-medium", isExpanded ? "text-foreground" : "text-muted-foreground")}>{name}</span>
+        </div>
 
-        <div className="flex items-center gap-1">
-          <span className="rounded-md bg-zinc-100 px-1.5 py-0.5 text-[11px] text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+        <div className="flex items-center gap-2">
+          <span className="flex h-5 items-center rounded-lg bg-accent/80 px-2 text-[10px] font-bold text-muted-foreground">
             {count}
           </span>
 
@@ -74,10 +77,11 @@ export default function FolderRow({ name, count, conversations, selectedId, onSe
                 e.stopPropagation()
                 setShowMenu(!showMenu)
               }}
-              className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-opacity"
+              className="opacity-0 group-hover/row:opacity-100 p-1.5 rounded-lg hover:bg-accent transition-all"
             >
-              <MoreHorizontal className="h-3 w-3" />
+              <MoreHorizontal className="h-4 w-4" />
             </button>
+
 
             <AnimatePresence>
               {showMenu && (
