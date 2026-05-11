@@ -1,7 +1,8 @@
 from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.routes import chats, documents
+from app.api.routes import chats, documents, users
+from app.models.user import Base
 from app.db.session import engine
 from sqlalchemy import text
 from contextlib import asynccontextmanager
@@ -10,6 +11,8 @@ from contextlib import asynccontextmanager
 async def lifespan(app: FastAPI):
     # --- Startup logic ---
     try:
+        # Create tables
+        Base.metadata.create_all(bind=engine)
         with engine.connect() as connection:
             connection.execute(text("SELECT 1"))
         print("Successfully connected to PostgreSQL!")
@@ -36,6 +39,7 @@ app.add_middleware(
 
 app.include_router(chats.router, prefix="/api/v1", tags=["Chat"])
 app.include_router(documents.router, prefix="/api/v1", tags=["Documents"])
+app.include_router(users.router, prefix="/api/v1/users", tags=["Users"])
 
 @app.get("/")
 def root():

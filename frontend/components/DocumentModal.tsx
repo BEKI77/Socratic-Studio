@@ -3,11 +3,13 @@ import { motion, AnimatePresence } from "framer-motion"
 import { X, FileText, Hash, BookOpen } from "lucide-react"
 import { useState, useEffect } from "react"
 import { fetchDocumentChunks } from "@/lib/api"
+import { useAuth } from "@/hooks/useAuth"
 
 interface DocumentModalProps {
   isOpen: boolean
   onClose: () => void
   documentName: string
+  documentId: string
 }
 
 interface Chunk {
@@ -17,18 +19,19 @@ interface Chunk {
   page: number | null
 }
 
-export default function DocumentModal({ isOpen, onClose, documentName }: DocumentModalProps) {
+export default function DocumentModal({ isOpen, onClose, documentName, documentId }: DocumentModalProps) {
+  const { token } = useAuth()
   const [chunks, setChunks] = useState<Chunk[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [activeChunk, setActiveChunk] = useState<number>(0)
 
   useEffect(() => {
-    if (isOpen && documentName) {
+    if (isOpen && documentId && token) {
       setIsLoading(true)
       setError(null)
       setActiveChunk(0)
-      fetchDocumentChunks(documentName)
+      fetchDocumentChunks(documentId, token)
         .then((data) => {
           setChunks(data.chunks)
         })
@@ -37,7 +40,7 @@ export default function DocumentModal({ isOpen, onClose, documentName }: Documen
         })
         .finally(() => setIsLoading(false))
     }
-  }, [isOpen, documentName])
+  }, [isOpen, documentId, token])
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -95,11 +98,10 @@ export default function DocumentModal({ isOpen, onClose, documentName }: Documen
                     <button
                       key={idx}
                       onClick={() => setActiveChunk(idx)}
-                      className={`w-full flex items-center gap-2 px-3 py-2 text-left text-xs transition-colors ${
-                        idx === activeChunk
-                          ? "bg-primary/10 text-primary font-medium"
-                          : "text-muted-foreground hover:bg-accent/30"
-                      }`}
+                      className={`w-full flex items-center gap-2 px-3 py-2 text-left text-xs transition-colors ${idx === activeChunk
+                        ? "bg-primary/10 text-primary font-medium"
+                        : "text-muted-foreground hover:bg-accent/30"
+                        }`}
                     >
                       <Hash className="h-3 w-3 shrink-0" />
                       <span className="truncate">

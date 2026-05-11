@@ -1,18 +1,21 @@
 "use client"
-import { Asterisk, MoreHorizontal, Menu, ChevronDown } from "lucide-react"
+import { Asterisk, MoreHorizontal, Menu, ChevronDown, LogOut } from "lucide-react"
 import { useState } from "react"
 import GhostIconButton from "./GhostIconButton"
+import { useAuth } from "@/hooks/useAuth"
 import { cls } from "./utils"
 
 interface HeaderProps {
   createNewChat: () => void
   sidebarCollapsed: boolean
   setSidebarOpen: (open: boolean) => void
+  onOpenSettings: () => void
 }
 
-export default function Header({ createNewChat, sidebarCollapsed, setSidebarOpen }: HeaderProps) {
+export default function Header({ createNewChat, sidebarCollapsed, setSidebarOpen, onOpenSettings }: HeaderProps) {
   const [selectedBot, setSelectedBot] = useState("Socratic Tutor")
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const { logout } = useAuth()
 
   const chatbots = [
     { name: "Socratic Tutor", icon: "�" },
@@ -78,11 +81,20 @@ export default function Header({ createNewChat, sidebarCollapsed, setSidebarOpen
           <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
           <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest">Live Engine</span>
         </div>
-        <GhostIconButton label="Options">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl hover:bg-accent/50 transition-colors">
-            <MoreHorizontal className="h-5 w-5" />
-          </div>
-        </GhostIconButton>
+        <button
+          onClick={logout}
+          className="flex h-10 w-10 items-center justify-center rounded-2xl hover:bg-destructive/10 hover:text-destructive transition-colors text-muted-foreground"
+          title="Logout"
+        >
+          <LogOut className="h-5 w-5" />
+        </button>
+        <button
+          onClick={onOpenSettings}
+          className="flex h-10 w-10 items-center justify-center rounded-2xl hover:bg-accent/50 transition-colors text-muted-foreground"
+          title="Settings"
+        >
+          <MoreHorizontal className="h-5 w-5" />
+        </button>
       </div>
     </div>
 

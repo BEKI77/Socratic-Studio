@@ -1,4 +1,6 @@
 import os
+import uuid
+from typing import Optional
 from fastapi import UploadFile
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_postgres import PGVector
@@ -26,7 +28,7 @@ vector_store = PGVector(
 )
 
 # 3. Process and Ingest
-async def ingest_uploaded_file(file: UploadFile):
+async def ingest_uploaded_file(file: UploadFile, user_id: Optional[int] = None):
     temp_path = f"temp_{file.filename}"
     try:
         # Write file to disk
@@ -37,14 +39,23 @@ async def ingest_uploaded_file(file: UploadFile):
         docs = load_document(temp_path)
         chunks = text_splitter.split_documents(docs)
         
-        # Add to DB
-        add_documents_to_db(chunks)
+        # Generate a unique document ID
+        doc_uuid = str(uuid.uuid4())
         
-        # RETURN a dictionary so the API can show success
+        # Add to DB
+        # Inject both doc_id and source into metadata
+        for chunk in chunks:
+            chunk.metadata["doc_id"] = doc_uuid
+            chunk.metadata["source"] = file.filename
+
+        add_documents_to_db(chunks, user_id=user_id)
+        
+        # RETURN a dictionary that matches the DocumentSummary interface
         return {
-            "status": "success",
-            "filename": file.filename,
-            "chunks_ingested": len(chunks)
+            "id": doc_uuid,
+            "name": file.filename,
+            "chunkCount": len(chunks),
+            "status": "success"
         }
 
     finally:

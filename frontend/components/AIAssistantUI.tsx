@@ -8,17 +8,19 @@ import type {
   Folder,
   Document,
   DocumentSummary,
+  DocumentUploadResponse,
   CollapsedState
 } from "../types/types"
-import { Calendar, LayoutGrid, MoreHorizontal, Menu } from "lucide-react"
+import { Menu } from "lucide-react"
 import Sidebar from "./Sidebar"
 import Header from "./Header"
 import ChatPane from "./ChatPane"
-import GhostIconButton from "./GhostIconButton"
 import ThemeToggle from "./ThemeToggle"
 import { INITIAL_TEMPLATES } from "./mockData"
-import { askQuestion, fetchDocuments, uploadDocument } from "@/lib/api"
+import { askQuestion, fetchDocuments, uploadDocument, fetchChatSessions } from "@/lib/api"
 import DocumentModal from "./DocumentModal"
+import SettingsModal from "./SettingsModal"
+import { useAuth } from "@/hooks/useAuth"
 import { cls, makeId } from "./utils"
 
 const createSessionConversation = (): Conversation => ({
@@ -119,11 +121,22 @@ export default function AIAssistantUI() {
   const [thinkingConvId, setThinkingConvId] = useState<string | null>(null)
 
   const [docModalOpen, setDocModalOpen] = useState<boolean>(false)
+  const [settingsModalOpen, setSettingsModalOpen] = useState<boolean>(false)
   const [selectedDocName, setSelectedDocName] = useState<string>("")
+  const [selectedDocId, setSelectedDocId] = useState<string>("")
 
-  function handleDocumentClick(documentName: string): void {
-    setSelectedDocName(documentName)
-    setDocModalOpen(true)
+  const { token, logout } = useAuth()
+
+  function handleDocumentClick(docId: string): void {
+    const doc = documents.find(d => d.id === docId)
+    if (doc) {
+      setSelectedDocName(doc.name)
+      // Passing docId here would be better, but the Modal currently 
+      // uses the 'documentName' prop as the identifier. 
+      // We'll update the Modal to take 'docId' for true uniqueness.
+      setDocModalOpen(true)
+      setSelectedDocId(docId)
+    }
   }
 
   useEffect(() => {
@@ -152,10 +165,35 @@ export default function AIAssistantUI() {
   }, [])
 
   useEffect(() => {
-    fetchDocuments().then((docs: DocumentSummary[]) =>
+    if (!token) return
+    fetchDocuments(token).then((docs: DocumentSummary[]) =>
       setDocuments(docs.map(doc => ({ ...doc, uploadedAt: new Date().toISOString() })))
     )
-  }, [])
+  }, [token])
+
+  useEffect(() => {
+    if (!token) return
+    fetchChatSessions(token).then((sessions: any[]) => {
+      if (sessions.length > 0) {
+        setConversations(sessions.map(s => ({
+          id: s.id.toString(),
+          title: s.title,
+          updatedAt: new Date().toISOString(),
+          messageCount: s.messages.length,
+          preview: s.messages[s.messages.length - 1]?.content.slice(0, 80) || "New Session",
+          pinned: false,
+          folder: "Study Sessions",
+          messages: s.messages.map((m: any, idx: number) => ({
+            id: makeId("m") + idx,
+            role: m.role,
+            content: m.content,
+            createdAt: new Date().toISOString()
+          }))
+        })))
+        setSelectedId(sessions[0].id.toString())
+      }
+    })
+  }, [token])
 
   const filtered = useMemo(() => {
     if (!query.trim()) return conversations
@@ -227,20 +265,14 @@ export default function AIAssistantUI() {
     setThinkingConvId(convId)
 
     try {
-      const payload = await askQuestion(content)
-      const normalizedSources = Array.isArray(payload.sources)
-        ? payload.sources.map((source) => ({
-          id: source.id,
-          documentName: source.documentName || "Document",
-          preview: source.preview ?? "",
-        }))
-        : []
+      if (!token) return
+      const payload = await askQuestion(content, token, isNaN(Number(convId)) ? undefined : Number(convId))
+
       const asstMsg: Message = {
         id: makeId("m"),
         role: "assistant" as const,
-        content: payload.response,
+        content: payload.content,
         createdAt: new Date().toISOString(),
-        sources: normalizedSources,
       }
 
       setConversations((prev) =>
@@ -332,8 +364,17 @@ export default function AIAssistantUI() {
     setUploadStatus("Indexing your material...")
 
     try {
-      const document: DocumentSummary = await uploadDocument(file)
-      setDocuments((prev) => [...prev, { ...document, uploadedAt: new Date().toISOString() }])
+      if (!token) return
+      const result: DocumentUploadResponse = await uploadDocument(file, token)
+
+      // Update local state with the new document immediately
+      // The result now matches the DocumentSummary / Document structure
+      const newDoc: Document = {
+        ...result,
+        uploadedAt: new Date().toISOString()
+      }
+
+      setDocuments((prev) => [...prev, newDoc])
       setUploadStatus("Document indexed. Ask your next question.")
     } catch (error) {
       const message = error instanceof Error ? error.message : "Upload failed."
@@ -347,9 +388,9 @@ export default function AIAssistantUI() {
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-background text-foreground p-0 m-0">
       {/* Decorative Background Elements */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,oklch(0.62_0.18_25_/_0.15),transparent_70%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-hero-grid opacity-[0.03] dark:opacity-[0.05]" />
-      <div className="pointer-events-none absolute top-[-40%] left-1/2 h-250 w-250 -translate-x-1/2 rounded-full bg-primary/5 blur-[120px]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,oklch(0.55_0.18_245/0.15),transparent_70%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-hero-grid opacity-[0.03] dark:opacity-[0.08]" />
+      <div className="pointer-events-none absolute top-[-40%] left-1/2 h-250 w-250 -translate-x-1/2 rounded-full bg-blue-500/5 blur-[120px]" />
 
       <div className="relative flex min-h-screen flex-col">
         <div className="md:hidden sticky top-0 z-40 flex items-center gap-2 border-b border-border/50 bg-background/80 px-4 py-3 backdrop-blur-xl">
@@ -361,7 +402,7 @@ export default function AIAssistantUI() {
             <Menu className="h-5 w-5" />
           </button>
           <div className="flex items-center gap-2 text-sm font-bold tracking-tight">
-            <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-lg shadow-primary/20">
+            <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-blue-600 text-white shadow-lg shadow-blue-500/20">
               <span className="text-xs">✱</span>
             </div>
             <span className="text-gradient">Socratic Studio</span>
@@ -419,7 +460,12 @@ export default function AIAssistantUI() {
 
             <ResizablePanel defaultSize={80}>
               <main className="relative flex h-full min-w-0 flex-col overflow-hidden glass md:rounded-4xl">
-                <Header createNewChat={createNewChat} sidebarCollapsed={sidebarCollapsed} setSidebarOpen={setSidebarOpen} />
+                <Header
+                  createNewChat={createNewChat}
+                  sidebarCollapsed={sidebarCollapsed}
+                  setSidebarOpen={setSidebarOpen}
+                  onOpenSettings={() => setSettingsModalOpen(true)}
+                />
                 <ChatPane
                   ref={composerRef}
                   conversation={selected}
@@ -439,6 +485,12 @@ export default function AIAssistantUI() {
         isOpen={docModalOpen}
         onClose={() => setDocModalOpen(false)}
         documentName={selectedDocName}
+        documentId={selectedDocId}
+      />
+
+      <SettingsModal
+        isOpen={settingsModalOpen}
+        onClose={() => setSettingsModalOpen(false)}
       />
     </div>
   )

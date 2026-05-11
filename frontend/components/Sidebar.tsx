@@ -17,12 +17,12 @@ import {
 import SidebarSection from "./SidebarSection"
 import ConversationRow from "./ConversationRow"
 import FolderRow from "./FolderRow"
-import TemplateRow from "./TemplateRow"
 import ThemeToggle from "./ThemeToggle"
 import CreateFolderModal from "./CreateFolderModal"
 import CreateTemplateModal from "./CreateTemplateModal"
 import SearchModal from "./SearchModal"
 import SettingsPopover from "./SettingsPopover"
+import { useAuth } from "@/hooks/useAuth"
 import { cls, makeId } from "./utils"
 import { useEffect, useState, useRef } from "react"
 import type {
@@ -63,6 +63,7 @@ export default function Sidebar({
   onUpload = () => { },
   onDocumentClick = () => { },
 }: SidebarProps) {
+  const { user } = useAuth()
   const [isDesktop, setIsDesktop] = useState(() => {
     if (typeof window === "undefined") return true
     return window.matchMedia("(min-width: 768px)").matches
@@ -234,7 +235,7 @@ export default function Sidebar({
             {/* Minimal Header */}
             <div className="flex items-center justify-between px-6 py-6">
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-500/20">
                   <Asterisk className="h-5 w-5" />
                 </div>
                 <span className="text-lg font-bold tracking-tight text-gradient">Socratic</span>
@@ -251,7 +252,7 @@ export default function Sidebar({
             <div className="px-4 space-y-3 mb-6">
               <button
                 onClick={createNewChat}
-                className="group relative flex w-full items-center gap-3 rounded-2xl bg-primary px-5 py-3 text-[14px] font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="group relative flex w-full items-center gap-3 rounded-2xl bg-blue-600 px-5 py-3 text-[14px] font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 <Plus className="h-4 w-4" />
                 <span>New Session</span>
@@ -362,8 +363,8 @@ export default function Sidebar({
                   <div className="space-y-1">
                     {documents.map((doc, idx) => (
                       <button
-                        key={idx}
-                        onClick={() => onDocumentClick(doc.name)}
+                        key={doc.id || idx}
+                        onClick={() => onDocumentClick(doc.id)}
                         className="flex w-full items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-accent/30 text-[11px] text-muted-foreground group text-left transition-colors"
                       >
                         <FileText className="h-3 w-3 shrink-0" />
@@ -380,11 +381,13 @@ export default function Sidebar({
               <div className="flex items-center justify-between">
                 <SettingsPopover>
                   <button className="flex items-center gap-3 group transition-all">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary/80 to-primary text-[12px] font-bold text-white shadow-lg shadow-primary/20">
-                      ST
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br from-blue-500/80 to-blue-600 text-[12px] font-bold text-white shadow-lg shadow-blue-500/20">
+                      {user?.username?.slice(0, 2).toUpperCase() || "ST"}
                     </div>
                     <div className="text-left">
-                      <div className="text-[13px] font-bold text-foreground">Student</div>
+                      <div className="text-[13px] font-bold text-foreground truncate max-w-[120px]">
+                        {user?.username || "Student"}
+                      </div>
                       <div className="text-[10px] text-muted-foreground/60 uppercase tracking-widest font-bold">Workspace</div>
                     </div>
                   </button>

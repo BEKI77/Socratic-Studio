@@ -1,4 +1,4 @@
-from typing import List, Set
+from typing import List, Set, Optional
 from langchain_core.documents import Document
 from langchain_postgres import PGVector
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -24,11 +24,14 @@ vector_store = PGVector(
     use_jsonb=True
 )
 
-def add_documents_to_db(chunks: List[Document]):
+def add_documents_to_db(chunks: List[Document], user_id: Optional[int] = None):
     """
     Takes a list of LangChain Document objects, 
     embeds them, and inserts them into PGVector.
     """
+    if user_id:
+        for chunk in chunks:
+            chunk.metadata["user_id"] = user_id
     try:
         # PGVector handles the embedding calculation and the SQL INSERT
         vector_store.add_documents(chunks)
@@ -37,28 +40,31 @@ def add_documents_to_db(chunks: List[Document]):
         print(f"Error adding documents to PGVector: {e}")
         raise
 
-def search_documents_db(query: str, top_k: int = 4) -> List[Document]:
+def search_documents_db(query: str, top_k: int = 4, user_id: Optional[int] = None) -> List[Document]:
     """
     Queries the vector store for the most similar chunks.
     """
+    filter = None
+    if user_id:
+        filter = {"user_id": user_id}
+        
     # vector_store.similarity_search automatically handles 
     # embedding the 'query' string and performing the vector search
-    return vector_store.similarity_search(query, k=top_k)
+    return vector_store.similarity_search(query, k=top_k, filter=filter)
 
-def get_document_chunks(source_name: str) -> List[dict]:
+def get_document_chunks(doc_id: str, user_id: Optional[int] = None) -> List[dict]:
     """
-    Retrieves all chunks belonging to a specific document source.
+    Retrieves all chunks belonging to a specific document ID.
     """
     try:
-        # Use a filter to search only within the specified source
-        filter_doc = Document(
-            page_content="",
-            metadata={"source": source_name}
-        )
+        filter_dict = {"doc_id": doc_id}
+        if user_id:
+            filter_dict["user_id"] = user_id
+
         results = vector_store.similarity_search(
             "", 
-            k=100,
-            filter={"source": source_name}
+            k=500, # Increased k to get more chunks for large docs
+            filter=filter_dict
         )
         
         chunks = [
@@ -75,7 +81,7 @@ def get_document_chunks(source_name: str) -> List[dict]:
         print(f"Error fetching document chunks: {e}")
         return []
 
-def list_documents_db() -> List[dict]:
+def list_documents_db(user_id: Optional[int] = None) -> List[dict]:
     """
     Retrieves a list of unique document names/sources currently stored 
     in the vector database, along with their chunk counts.
@@ -83,18 +89,30 @@ def list_documents_db() -> List[dict]:
     try:
         # We perform a broad search to find documents. 
         # Note: If you have thousands of docs, you might prefer a direct SQL query.
-        all_docs = vector_store.similarity_search("", k=100) 
+        filter_dict = None
+        if user_id:
+            filter_dict = {"user_id": user_id}
+            
+        all_docs = vector_store.similarity_search("", k=100, filter=filter_dict) 
         
-        # Group by source name and count chunks
-        source_chunks: dict[str, int] = {}
+        # Group by doc_id and count chunks
+        # Store source name associated with each doc_id
+        doc_groups: dict[str, dict] = {}
         for doc in all_docs:
-            source = doc.metadata.get("source", "Unknown Source")
-            source_chunks[source] = source_chunks.get(source, 0) + 1
+            d_id = doc.metadata.get("doc_id")
+            if not d_id: continue
+            
+            if d_id not in doc_groups:
+                doc_groups[d_id] = {
+                    "name": doc.metadata.get("source", "Unknown Source"),
+                    "count": 0
+                }
+            doc_groups[d_id]["count"] += 1
         
         # Build document objects matching frontend's DocumentSummary interface
         documents = [
-            {"id": str(i), "name": name, "chunkCount": count}
-            for i, (name, count) in enumerate(sorted(source_chunks.items()))
+            {"id": d_id, "name": info["name"], "chunkCount": info["count"]}
+            for d_id, info in doc_groups.items()
         ]
         return documents
     except Exception as e:

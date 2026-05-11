@@ -1,3 +1,10 @@
+export interface DocumentUploadResponse {
+  id: string;
+  name: string;
+  chunkCount: number;
+  status: string;
+}
+
 export interface DocumentSummary {
   id: string;
   name: string;
