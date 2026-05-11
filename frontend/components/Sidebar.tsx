@@ -5,7 +5,6 @@ import {
   PanelLeftOpen,
   SearchIcon,
   Plus,
-  Star,
   Clock,
   FolderIcon,
   FileText,
