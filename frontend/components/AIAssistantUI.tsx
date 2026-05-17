@@ -41,13 +41,8 @@ import {
 } from "@/components/ui/resizable"
 
 export default function AIAssistantUI() {
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
-    const saved = typeof window !== "undefined" && localStorage.getItem("theme")
-    if (saved) return saved as "light" | "dark"
-    if (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches)
-      return "dark"
-    return "light"
-  })
+  const [theme, setTheme] = useState<"light" | "dark">("light")
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     try {
@@ -58,6 +53,15 @@ export default function AIAssistantUI() {
       localStorage.setItem("theme", theme)
     } catch { }
   }, [theme])
+
+  useEffect(() => {
+    setMounted(true)
+    try {
+      const saved = localStorage.getItem("theme")
+      if (saved) setTheme(saved as "light" | "dark")
+      else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) setTheme("dark")
+    } catch {}
+  }, [])
 
   useEffect(() => {
     try {
@@ -73,28 +77,26 @@ export default function AIAssistantUI() {
   }, [])
 
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false)
-  const [collapsed, setCollapsed] = useState<CollapsedState>(() => {
+  const [collapsed, setCollapsed] = useState<CollapsedState>({ pinned: true, recent: false, folders: true, templates: true })
+  useEffect(() => {
     try {
       const raw = localStorage.getItem("sidebar-collapsed")
-      return raw ? JSON.parse(raw) : { pinned: true, recent: false, folders: true, templates: true }
-    } catch {
-      return { pinned: true, recent: false, folders: true, templates: true }
-    }
-  })
+      if (raw) setCollapsed(JSON.parse(raw))
+    } catch {}
+  }, [])
   useEffect(() => {
     try {
       localStorage.setItem("sidebar-collapsed", JSON.stringify(collapsed))
     } catch { }
   }, [collapsed])
 
-  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() => {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false)
+  useEffect(() => {
     try {
       const saved = localStorage.getItem("sidebar-collapsed-state")
-      return saved ? JSON.parse(saved) : false
-    } catch {
-      return false
-    }
-  })
+      if (saved) setSidebarCollapsed(JSON.parse(saved))
+    } catch {}
+  }, [])
 
   useEffect(() => {
     try {
@@ -428,6 +430,7 @@ export default function AIAssistantUI() {
                   onResendMessage={(messageId) => selected && resendMessage(selected.id, messageId)}
                   isThinking={isThinking && thinkingConvId === selected?.id}
                   onPauseThinking={pauseThinking}
+                  onUpload={handleUpload}
                 />
               </main>
             </ResizablePanel>

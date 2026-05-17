@@ -1,10 +1,10 @@
 "use client"
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Paperclip, Bot, Search, Palette, BookOpen, MoreHorizontal, Globe, ChevronRight } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
 
 interface Action {
-  icon: React.ComponentType<{ className?: string }> | React.ReactNode
+  icon: React.ComponentType<{ className?: string }>
   label: string
   action: () => void
   badge?: string
@@ -12,17 +12,41 @@ interface Action {
 
 interface ComposerActionsPopoverProps {
   children: React.ReactNode
+  onUpload?: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
-export default function ComposerActionsPopover({ children }: ComposerActionsPopoverProps) {
+const GoogleDriveIcon = () => (
+  <div className="h-5 w-5 rounded bg-gradient-to-br from-blue-500 via-green-400 to-yellow-400 flex items-center justify-center">
+    <div className="h-2.5 w-2.5 bg-white rounded-sm" />
+  </div>
+)
+
+const OneDriveIcon = () => (
+  <div className="h-5 w-5 rounded bg-blue-500 flex items-center justify-center">
+    <div className="h-2.5 w-2.5 bg-white rounded-sm" />
+  </div>
+)
+
+const SharepointIcon = () => (
+  <div className="h-5 w-5 rounded bg-teal-500 flex items-center justify-center">
+    <div className="h-2.5 w-2.5 bg-white rounded-sm" />
+  </div>
+)
+
+export default function ComposerActionsPopover({ children, onUpload }: ComposerActionsPopoverProps) {
   const [open, setOpen] = useState<boolean>(false)
   const [showMore, setShowMore] = useState<boolean>(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const mainActions: Action[] = [
     {
       icon: Paperclip,
       label: "Add photos & files",
-      action: () => console.log("Add photos & files"),
+      action: () => {
+        setOpen(false)
+        // Small delay lets popover close before opening file dialog
+        setTimeout(() => fileInputRef.current?.click(), 100)
+      },
     },
     {
       icon: Bot,
@@ -48,43 +72,11 @@ export default function ComposerActionsPopover({ children }: ComposerActionsPopo
   ]
 
   const moreActions: Action[] = [
-    {
-      icon: Globe,
-      label: "Web search",
-      action: () => console.log("Web search"),
-    },
-    {
-      icon: Palette,
-      label: "Canvas",
-      action: () => console.log("Canvas"),
-    },
-    {
-      icon: () => (
-        <div className="h-5 w-5 rounded bg-gradient-to-br from-blue-500 via-green-400 to-yellow-400 flex items-center justify-center">
-          <div className="h-2.5 w-2.5 bg-white rounded-sm" />
-        </div>
-      ),
-      label: "Connect Google Drive",
-      action: () => console.log("Connect Google Drive"),
-    },
-    {
-      icon: () => (
-        <div className="h-5 w-5 rounded bg-blue-500 flex items-center justify-center">
-          <div className="h-2.5 w-2.5 bg-white rounded-sm" />
-        </div>
-      ),
-      label: "Connect OneDrive",
-      action: () => console.log("Connect OneDrive"),
-    },
-    {
-      icon: () => (
-        <div className="h-5 w-5 rounded bg-teal-500 flex items-center justify-center">
-          <div className="h-2.5 w-2.5 bg-white rounded-sm" />
-        </div>
-      ),
-      label: "Connect Sharepoint",
-      action: () => console.log("Connect Sharepoint"),
-    },
+    { icon: Globe, label: "Web search", action: () => console.log("Web search") },
+    { icon: Palette, label: "Canvas", action: () => console.log("Canvas") },
+    { icon: GoogleDriveIcon, label: "Connect Google Drive", action: () => console.log("Connect Google Drive") },
+    { icon: OneDriveIcon, label: "Connect OneDrive", action: () => console.log("Connect OneDrive") },
+    { icon: SharepointIcon, label: "Connect Sharepoint", action: () => console.log("Connect Sharepoint") },
   ]
 
   const handleAction = (action: () => void) => {
@@ -123,13 +115,7 @@ export default function ComposerActionsPopover({ children }: ComposerActionsPopo
                     onClick={() => handleAction(action.action)}
                     className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-left hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                   >
-                    {typeof IconComponent === 'function' && 'className' in IconComponent ? (
-                      <IconComponent className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
-                    ) : typeof IconComponent === 'function' ? (
-                      <IconComponent />
-                    ) : (
-                      IconComponent
-                    )}
+                    <IconComponent className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
                     <span>{action.label}</span>
                     {action.badge && (
                       <span className="ml-auto px-2 py-0.5 text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 rounded-full font-medium">
@@ -162,13 +148,7 @@ export default function ComposerActionsPopover({ children }: ComposerActionsPopo
                       onClick={() => handleAction(action.action)}
                       className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-left hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                     >
-                      {typeof IconComponent === 'function' && 'className' in IconComponent ? (
-                        <IconComponent className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
-                      ) : typeof IconComponent === 'function' ? (
-                        <IconComponent />
-                      ) : (
-                        IconComponent
-                      )}
+                      <IconComponent className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
                       <span>{action.label}</span>
                       {action.badge && (
                         <span className="ml-auto px-2 py-0.5 text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 rounded-full font-medium">
@@ -199,11 +179,7 @@ export default function ComposerActionsPopover({ children }: ComposerActionsPopo
                       onClick={() => handleAction(action.action)}
                       className="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-left hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                     >
-                      {typeof IconComponent === "function" ? (
-                        <IconComponent className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
-                      ) : (
-                        IconComponent
-                      )}
+                      <IconComponent className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
                       <span>{action.label}</span>
                     </button>
                   )
@@ -213,6 +189,18 @@ export default function ComposerActionsPopover({ children }: ComposerActionsPopo
           </div>
         )}
       </PopoverContent>
+
+      {/* Keep file input outside PopoverContent so it isn't unmounted when popover closes */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".pdf,.txt"
+        className="sr-only"
+        onChange={(e) => {
+          onUpload?.(e)
+          setOpen(false)
+        }}
+      />
     </Popover>
   )
 }

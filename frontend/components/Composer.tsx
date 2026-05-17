@@ -8,6 +8,7 @@ import { cls } from "./utils"
 interface ComposerProps {
   onSend?: (text: string) => Promise<void>
   busy: boolean
+  onUpload?: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 interface ComposerRef {
@@ -15,7 +16,7 @@ interface ComposerRef {
   focus: () => void
 }
 
-const Composer = forwardRef<ComposerRef, ComposerProps>(function Composer({ onSend, busy }, ref: ForwardedRef<ComposerRef>) {
+const Composer = forwardRef<ComposerRef, ComposerProps>(function Composer({ onSend, busy, onUpload }, ref: ForwardedRef<ComposerRef>) {
   const [value, setValue] = useState<string>("")
   const [sending, setSending] = useState<boolean>(false)
   const [lineCount, setLineCount] = useState<number>(1)
@@ -108,7 +109,7 @@ const Composer = forwardRef<ComposerRef, ComposerProps>(function Composer({ onSe
 
         <div className="flex items-center justify-between px-4 pb-4">
           <div className="flex items-center gap-1">
-            <ComposerActionsPopover>
+            <ComposerActionsPopover onUpload={onUpload}>
               <button
                 className="inline-flex h-10 w-10 items-center justify-center rounded-2xl text-muted-foreground hover:bg-accent/50 hover:text-foreground transition-all duration-200"
                 title="Tools"

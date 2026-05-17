@@ -219,7 +219,7 @@ export default function Sidebar({
       </AnimatePresence>
 
       <AnimatePresence>
-        {(open || typeof window !== "undefined") && (
+        {(open || isDesktop) && (
           <motion.aside
             key="sidebar"
             initial={isDesktop ? false : { x: "-100%" }}

@@ -14,6 +14,33 @@ text_splitter = RecursiveCharacterTextSplitter(
 async def ingest_uploaded_file(file: UploadFile):
     temp_path = f"temp_{file.filename}"
     try:
+        with open(temp_path, "wb") as buffer:
+            buffer.write(await file.read())
+
+        docs = load_document(temp_path)
+        
+        # ✅ Fix: set the source metadata to the real filename, not the temp path
+        for doc in docs:
+            doc.metadata["source"] = file.filename
+
+        chunks = text_splitter.split_documents(docs)
+        
+        # ✅ Also fix source on chunks
+        for chunk in chunks:
+            chunk.metadata["source"] = file.filename
+
+        add_documents_to_db(chunks)
+
+        return {
+            "status": "success",
+            "filename": file.filename,
+            "chunks_ingested": len(chunks)
+        }
+    finally:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+    temp_path = f"temp_{file.filename}"
+    try:
         # Write uploaded file to disk temporarily
         with open(temp_path, "wb") as buffer:
             buffer.write(await file.read())

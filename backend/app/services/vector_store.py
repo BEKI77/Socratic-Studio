@@ -87,25 +87,52 @@ def list_documents_db(user_id: Optional[int] = None) -> List[dict]:
     along with their chunk counts.
     """
     try:
+        # Query Pinecone index stats first to ensure index has vectors
+        stats = index.describe_index_stats()
+
+        # Normalize stats access (could be dict or object depending on client)
+        total_vectors = None
+        namespaces = None
+        try:
+            if isinstance(stats, dict):
+                total_vectors = stats.get("total_vector_count")
+                namespaces = stats.get("namespaces")
+            else:
+                total_vectors = getattr(stats, "total_vector_count", None)
+                namespaces = getattr(stats, "namespaces", None)
+        except Exception:
+            total_vectors = None
+            namespaces = None
+
+        if total_vectors == 0 or (isinstance(namespaces, dict) and len(namespaces) == 0):
+            return []
+
         filter_dict = None
         if user_id:
             filter_dict = {"user_id": {"$eq": str(user_id)}}
 
-        # Broad search to discover stored documents
-        all_docs = vector_store.similarity_search(
-            "document",
-            k=100,
+        # Use a very broad/common query to retrieve many vectors
+        results = vector_store.similarity_search(
+            "the",
+            k=200,
             filter=filter_dict,
         )
 
+        print(f"DEBUG list_documents_db: got {len(results)} results from Pinecone")
+        for r in results[:3]:
+            try:
+                print(f"DEBUG metadata: {r.metadata}")
+            except Exception:
+                pass
+
         doc_groups: dict[str, dict] = {}
-        for doc in all_docs:
-            d_id = doc.metadata.get("doc_id")
+        for doc in results:
+            d_id = doc.metadata.get("doc_id") or doc.metadata.get("source")
             if not d_id:
                 continue
             if d_id not in doc_groups:
                 doc_groups[d_id] = {
-                    "name": doc.metadata.get("source", "Unknown Source"),
+                    "name": doc.metadata.get("source", doc.metadata.get("filename", "Unknown")),
                     "count": 0,
                 }
             doc_groups[d_id]["count"] += 1

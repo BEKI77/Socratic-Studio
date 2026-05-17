@@ -41,6 +41,7 @@ interface ChatPaneProps {
   onResendMessage?: (messageId: string) => void
   isThinking: boolean
   onPauseThinking: () => void
+  onUpload?: (event: React.ChangeEvent<HTMLInputElement>) => void
 }
 
 interface ChatPaneRef {
@@ -69,7 +70,7 @@ function ThinkingMessage({ onPause }: ThinkingMessageProps) {
 }
 
 const ChatPane = forwardRef<ChatPaneRef, ChatPaneProps>(function ChatPane(
-  { conversation, onSend, onEditMessage, onResendMessage, isThinking, onPauseThinking },
+  { conversation, onSend, onEditMessage, onResendMessage, isThinking, onPauseThinking, onUpload },
   ref: ForwardedRef<ChatPaneRef>,
 ) {
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -192,9 +193,10 @@ const ChatPane = forwardRef<ChatPaneRef, ChatPaneProps>(function ChatPane(
                     {m.role === "assistant" && Array.isArray(m.sources) && m.sources.length > 0 && (
                       <div className="mt-3 space-y-2">
                         <div className="text-[11px] uppercase tracking-wide text-zinc-400">Sources</div>
-                        {m.sources.map((source) => (
+                        {m.sources.map((source, idx) => (
+
                           <div
-                            key={source.id}
+                            key={source.id ?? idx}
                             className="rounded-xl border border-zinc-200 bg-white/80 p-2 text-xs text-zinc-600 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300"
                           >
                             <div className="font-semibold text-zinc-700 dark:text-zinc-200">
@@ -240,6 +242,7 @@ const ChatPane = forwardRef<ChatPaneRef, ChatPaneProps>(function ChatPane(
           setBusy(false)
         }}
         busy={busy}
+        onUpload={onUpload}
       />
     </div>
   )
