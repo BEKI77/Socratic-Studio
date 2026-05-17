@@ -1,7 +1,7 @@
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from app.rag.ingestion import ingest_uploaded_file # Your new logic
-from app.rag.vector_store import list_documents_db, get_document_chunks
-
+from app.services.llm import generate_socratic_response
+from app.services.vector_store import list_documents_db, get_document_chunks, search_documents_db, add_documents_to_db
 router = APIRouter()
 
 @router.get("/documents")

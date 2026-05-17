@@ -1,8 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends
 from app.models.chats import ChatRequest
 # from app.services.socratic_service import generate_socratic_response
-from app.rag.vector_store import search_documents_db
-from app.services.socratic_service import generate_socratic_response
+# from backend.app.services.vector_store import search_documents_db
+# from app.services.socratic_service import generate_socratic_response
+from app.services.llm import generate_socratic_response
+from app.services.vector_store import search_documents_db, add_documents_to_db
 
 # Define the router for this module
 router = APIRouter()

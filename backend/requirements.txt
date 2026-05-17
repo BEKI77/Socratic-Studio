@@ -3,13 +3,23 @@ fastapi-cli==0.0.7
 uvicorn[standard]==0.30.6
 python-multipart==0.0.9
 pypdf==4.2.0
-psycopg2
-# psycopg[binary]
-
+python-jose[cryptography]
+passlib[bcrypt]
+pydantic-settings
 langchain
 langchain-community
 langchain-core
 langchain-huggingface
-langchain_postgres
-
+email-validator
 sentence-transformers
+
+# Pinecone (replaces langchain_postgres / psycopg2)
+pinecone-client>=3.0.0
+langchain-pinecone
+
+# Groq (replaces Ollama/httpx calls)
+groq
+
+# SQLite async support
+aiosqlite
+sqlalchemy
