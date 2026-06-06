@@ -242,7 +242,7 @@ export default function AIAssistantUI() {
     setFolders((prev) => [...prev, { id: makeId("f"), name: proposed }])
   }
 
-  async function sendMessage(convId: string, content: string): Promise<void> {
+  async function sendMessage(convId: string, content: string, studentSolution?: string): Promise<void> {
     if (!content.trim()) return
     const now = new Date().toISOString()
     const userMsg: Message = { id: makeId("m"), role: "user" as const, content, createdAt: now }
@@ -266,7 +266,7 @@ export default function AIAssistantUI() {
 
     try {
       if (!token) return
-      const payload = await askQuestion(content, token, isNaN(Number(convId)) ? undefined : Number(convId))
+      const payload = await askQuestion(content, token, isNaN(Number(convId)) ? undefined : Number(convId), studentSolution ?? "")
 
       const asstMsg: Message = {
         id: makeId("m"),
@@ -469,7 +469,7 @@ export default function AIAssistantUI() {
                 <ChatPane
                   ref={composerRef}
                   conversation={selected}
-                  onSend={async (content: string) => { if (selected) await sendMessage(selected.id, content) }}
+                  onSend={async (content: string, studentSolution?: string) => { if (selected) await sendMessage(selected.id, content, studentSolution) }}
                   onEditMessage={(messageId, newContent) => selected && editMessage(selected.id, messageId, newContent)}
                   onResendMessage={(messageId) => selected && resendMessage(selected.id, messageId)}
                   isThinking={isThinking && thinkingConvId === selected?.id}

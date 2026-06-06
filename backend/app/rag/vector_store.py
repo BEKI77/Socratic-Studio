@@ -87,8 +87,6 @@ def list_documents_db(user_id: Optional[int] = None) -> List[dict]:
     in the vector database, along with their chunk counts.
     """
     try:
-        # We perform a broad search to find documents. 
-        # Note: If you have thousands of docs, you might prefer a direct SQL query.
         filter_dict = None
         if user_id:
             filter_dict = {"user_id": user_id}

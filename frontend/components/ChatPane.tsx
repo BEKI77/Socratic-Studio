@@ -36,7 +36,7 @@ interface Conversation {
 
 interface ChatPaneProps {
   conversation: Conversation | null
-  onSend?: (content: string) => Promise<void>
+  onSend?: (content: string, studentSolution: string) => Promise<void>
   onEditMessage?: (messageId: string, newContent: string) => void
   onResendMessage?: (messageId: string) => void
   isThinking: boolean
@@ -233,10 +233,10 @@ const ChatPane = forwardRef<ChatPaneRef, ChatPaneProps>(function ChatPane(
 
       <Composer
         ref={composerRef}
-        onSend={async (text) => {
+        onSend={async (text, studentSolution) => {
           if (!text.trim()) return
           setBusy(true)
-          await onSend?.(text)
+          await onSend?.(text, studentSolution)
           setBusy(false)
         }}
         busy={busy}

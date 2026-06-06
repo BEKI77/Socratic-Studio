@@ -6,7 +6,7 @@ import ComposerActionsPopover from "./ComposerActionsPopover"
 import { cls } from "./utils"
 
 interface ComposerProps {
-  onSend?: (text: string) => Promise<void>
+  onSend?: (text: string, studentSolution: string) => Promise<void>
   busy: boolean
 }
 
@@ -17,6 +17,7 @@ interface ComposerRef {
 
 const Composer = forwardRef<ComposerRef, ComposerProps>(function Composer({ onSend, busy }, ref: ForwardedRef<ComposerRef>) {
   const [value, setValue] = useState<string>("")
+  const [attempt, setAttempt] = useState<string>("")
   const [sending, setSending] = useState<boolean>(false)
   const [lineCount, setLineCount] = useState<number>(1)
   const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -68,8 +69,9 @@ const Composer = forwardRef<ComposerRef, ComposerProps>(function Composer({ onSe
     if (!value.trim() || sending) return
     setSending(true)
     try {
-      await onSend?.(value)
+      await onSend?.(value, attempt)
       setValue("")
+      setAttempt("")
       inputRef.current?.focus()
     } finally {
       setSending(false)
@@ -104,6 +106,22 @@ const Composer = forwardRef<ComposerRef, ComposerProps>(function Composer({ onSe
               }
             }}
           />
+          <div className="mx-5 border-t border-border/30" />
+          <div className="px-5 pt-3 pb-1">
+            <textarea
+              value={attempt}
+              onChange={(e) => setAttempt(e.target.value)}
+              placeholder="What have you tried so far? (your attempt)"
+              rows={1}
+              className="w-full resize-none bg-transparent text-[14px] outline-none placeholder:text-muted-foreground/40 text-muted-foreground leading-relaxed"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault()
+                  handleSend()
+                }
+              }}
+            />
+          </div>
         </div>
 
         <div className="flex items-center justify-between px-4 pb-4">

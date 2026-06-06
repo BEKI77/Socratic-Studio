@@ -86,14 +86,14 @@ export async function fetchDocumentChunks(source: string, token: string) {
   }>;
 }
 
-export async function askQuestion(question: string, token: string, chatId?: number) {
+export async function askQuestion(question: string, token: string, chatId?: number, studentSolution?: string) {
   const response = await fetch(`${API_BASE_URL}/chat`, {
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
       ...getHeaders(token)
     },
-    body: JSON.stringify({ question, chat_id: chatId }),
+    body: JSON.stringify({ question, chat_id: chatId, student_solution: studentSolution ?? "" }),
   });
 
   return parseJson(response) as Promise<{

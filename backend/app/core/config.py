@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
 print(f"--- DEBUGGING CONFIG LOAD ---")
 print(f"Absolute path of config.py: {Path(__file__).resolve()}")

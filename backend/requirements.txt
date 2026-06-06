@@ -15,4 +15,5 @@ langchain-huggingface
 langchain_postgres
 
 email-validator
-sentence-transformers
+torch>=2.0.0
+sentence-transformers>=3.0.0

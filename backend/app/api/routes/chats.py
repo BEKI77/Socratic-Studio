@@ -12,6 +12,7 @@ router = APIRouter()
 
 class ChatRequest(BaseModel):
     question: str
+    student_solution: str = ""
     chat_id: Optional[int] = None
 
 class MessageResponse(BaseModel):
@@ -60,7 +61,7 @@ async def chat(
         response_text = "I haven't studied that yet. Upload some notes!"
     else:
         # 4. Call the Model Service
-        response_text = await generate_socratic_response(request.question, chunks)
+        response_text = await generate_socratic_response(request.question, chunks, request.student_solution)
     
     # 5. Save assistant message
     assistant_msg = Message(chat_id=chat_obj.id, role="assistant", content=response_text)
